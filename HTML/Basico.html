@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Basico</title>
+	<link rel="stylesheet" type="text/css" href="../bootstrap/css/bootstrap.css">
+	<script src="../bootstrap/js/bootstrap.js"></script>
+	<script src="../blockly/blockly_compressed.js"></script>
+    <script src="../blockly/blocks_compressed.js"></script>
+    <script src="../blockly/msg/js/es.js"></script>  
+    <script src="../jquery-3.2.1.min.js"></script> 
+    <script src="../blockly/javascript_compressed.js"></script>
+</head>
+<body>
+	<ul class="nav nav-tabs" role="tablist">
+		<li role="presentation"><a href="Principal.html">Principal</a></li>
+		<li role="presentation" class="active"><a href="Basico.html">Basico</a></li>
+		<li role="presentation"><a href="Intermedio.html">Intermedio</a></li>
+		<li role="presentation"><a href="Avanzado.html">Avanzado</a></li>
+	</ul>
+	<br/>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8"><!-- primer columna, blockly-->
+				<div class="panel panel-success">
+	            <div class="panel-heading">
+	              <h3 class="panel-title">Editor</h3>
+	            </div>
+	            <div class="panel-body">	            
+					<div id="blocklyDiv" style="height: 600px; width: 100%;"></div>
+						<xml id="toolbox" style="display: none">
+						  <category name="Variables" custom="VARIABLE" colour="330"></category>
+						  <category name="Control" colour="210">
+						    <block type="controls_if"></block>
+						  </category>
+						  <category name="Ciclos" colour="135">
+						    <block type="controls_repeat_ext">
+						      <value name="TIMES">
+						        <block type="math_number">
+						          <field name="NUM">10</field>
+						        </block>
+						      </value>
+						    </block>
+						    <block type="controls_whileUntil"></block>
+						    <block type="controls_for">
+						      <value name="FROM">
+						        <block type="math_number">
+						          <field name="NUM">1</field>
+						        </block>
+						      </value>
+						      <value name="TO">
+						        <block type="math_number">
+						          <field name="NUM">10</field>
+						        </block>
+						      </value>
+						      <value name="BY">
+						        <block type="math_number">
+						          <field name="NUM">1</field>
+						        </block>
+						      </value>
+						    </block>					    
+						    <block type="controls_flow_statements"></block>
+						</category>
+						<category name="Condiciones" colour="210">
+							<block type="logic_compare"></block>
+							<block type="logic_operation"></block>
+							<block type="logic_negate"></block>
+							<block type="logic_boolean"></block>
+							<block type="logic_null"></block>
+						</category>
+						<category name="Valores" colour="210">
+							<block type="math_number">
+					          <field name="NUM">1</field>
+					        </block>
+					        <block type="text"></block>
+						    <block type="text_join"></block>
+						    <block type="text_append"></block>
+						    <block type="math_arithmetic"></block>
+						</category>
+						</xml>
+				      <script>
+				        var workspace = Blockly.inject('blocklyDiv',
+				            {toolbox: document.getElementById('toolbox')});
+				      </script> 
+	            </div>
+	        </div>
+	      </div>
+	      <div class="col-md-4"><!--salida-->
+	      	<div class="panel panel-success">
+	            <div class="panel-heading">
+	              <h3 class="panel-title">Codigo 3D</h3>
+	            </div>
+	            <div class="panel-body">	            
+	      			<textarea id="tbSalida" style="height: 600px; width: 100%"></textarea>					
+	            </div>
+	        </div>	      	
+	      </div>	      	     
+	      <script>
+		      function analizarBlockly() {
+		      Blockly.JavaScript.addReservedWords('code');
+		      var code = Blockly.JavaScript.workspaceToCode();		      
+		      $('#tbSalida').text(code);
+		      console.log(code);
+		      try {
+		      eval(code);
+		      } catch (e) {		      
+		      }
+		      }
+		      setInterval("analizarBlockly()",300);
+	      </script>
+
+      </div>   
+    </div>
+</body>
+</html>
