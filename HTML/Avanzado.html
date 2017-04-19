@@ -9,6 +9,7 @@
     <script src="../blockly/msg/js/es.js"></script>  
     <script src="../jquery-3.2.1.min.js"></script> 
     <script src="../blockly/javascript_compressed.js"></script>
+    <script src="../Analisis/Avanzado.js"></script>
 </head>
 <body>
 	<ul class="nav nav-tabs" role="tablist">
@@ -20,7 +21,31 @@
 	<br/>
 	<div class="container">
 		<div class="row">			
-			<div class="col-md-8"><!--EDITOR-->
+			<div class="col-md-2"><!--OPCIONES-->
+			<div class="panel panel-success">
+	            <div class="panel-heading">
+	              <h3 class="panel-title">Opciones</h3>
+	            </div>
+	            <div class="panel-body">	            
+					<button type="button" class="btn btn-info btn-block"  id="bAnalizar">Analizar</button>
+					<script type="text/javascript">
+						$(document).ready(function () {
+				        $('#bAnalizar').click(function () {
+				          try {          	
+				            var result = Avanzado.parse($('#tbEntrada').val())            
+				            alert('Analizado');
+
+				          } catch (e) {
+				            $("#tbEstructuras").html(String(e));
+				            alert('Error');
+				          }
+				        });
+				      });
+					</script>
+	            </div>
+	        </div>				
+	      	</div>
+	      	<div class="col-md-6"><!--EDITOR-->
 			<div class="panel panel-success">
 	            <div class="panel-heading">
 	              <h3 class="panel-title">Editor</h3>
@@ -36,7 +61,7 @@
 	              <h3 class="panel-title">Estructuras</h3>
 	            </div>
 	            <div class="panel-body">	            
-					<textarea id="tbSalida" style="height: 600px; width: 100%"></textarea>
+					<textarea id="tbEstructuras" style="height: 600px; width: 100%"></textarea>
 	            </div>
 	        </div>
 	      </div>	      	     	      
