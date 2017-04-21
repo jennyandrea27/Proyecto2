@@ -60,7 +60,23 @@
 "loop"				  return 'loop'
 "count"				  return 'count'
 "whilex"			  return 'whilex'
-"principal"			  return 'principal'
+"Principal"			  return 'principal'
+"getBool"			  return 'getBool'
+"getNum"			  return 'getNum'
+"outStr"			  return 'outStr'
+"outNum"			  return 'outNum'
+"inStr"			  	  return 'inStr'
+"inNum"			  	  return 'inNum'
+"show"			  	  return 'show'
+"getRandom"			  return 'getRandom'
+"getLength"			  return 'getLength'
+"throws"			  return 'throws'
+"NullPoinerException"			  return 'NullPoinerException'
+"MissingReturnStatement"	      return 'MissingReturnStatement'
+"ArithmeticException"			  return 'ArithmeticException'
+"StackOverFlowException"		  return 'StackOverFlowException'
+"HeapOverFlowException"			  return 'HeapOverFlowException'
+"PoolOverFlowException"			  return 'PoolOverFlowException'
 "true"				  return 'true'
 "false"				  return 'false'
 [a-zA-Z]([a-zA-Z0-9_])* return 'id'
@@ -85,17 +101,17 @@ INICIO : BASIC EOF
 	   {
 	   	return $1;
 	   };
-BASIC : BASIC BSENT
-	   | BSENT {$$=$1;};
+BASIC : BASIC BSENT {$1.hijos.push($2);$$=$1;}
+	   | BSENT {$$={nombre:'basic',hijos:[$1]};};
 BSENT : DECVAR {$$=$1;}
 	   | DECFUN {$$=$1;}
 	   | DECARR {$$=$1;}
-	   | PRINCIPAL;
+	   | PRINCIPAL{$$=$1;};
 DECVAR : TVAR LIDC VALVAR ';' {$$={nombre:'dec',tipo:$1,hijos:[$2,$3]};};
 TVAR : tbool {$$='tbool';}
 	  |tnum {$$='tnum';}
 	  |tstr {$$='tstr'}
-	  |id {$$=$1;};
+	  |LIDP {$$=$1;};
 LIDC : LIDC ',' id {$1.hijos.push($3);$$=$1;}
 	 | id {$$={nombre:'lid',hijos:[$1]};};
 VALVAR : ':' EXP {$$=$2;}
@@ -130,9 +146,11 @@ EXP2 : EXP2 '+' EXP2 {$$={nombre:'+',hijos: [$1 , $3]};}
 EXP3 : num {$$={nombre:'valor',tipo:'num', valor : $1};}
 	| true {$$={nombre:'valor',tipo:'bool', valor : 'true'};}
 	| false {$$={nombre:'valor',tipo:'bool', valor : 'false'};}
-	| id {$$={nombre:'valor',tipo:'id', valor : $1};}
+	| LIDP {$$=$1;}
 	| cad {$$={nombre:'valor',tipo:'cad', valor : $1};}
 	| '(' EXP ')'{$$=$2;};       
+LIDP : LIDP '.' id{$1.hijos.push($3);$$=$1;}
+	 | id{$$={nombre:'lidp',hijos:[$1]};};
 DECFUN : TFUN LC ':' id '(' LPAR ')' '{' CUERPO '}'
 		{
 		$$={nombre:'decfun',tipo:$1,valor:$4,hijos:[]};
@@ -149,8 +167,8 @@ LC : LCV {$$=$1;}
 	| {$$=null;};
 LPAR :LPAR ',' TVAR id LC {var v={nombre:$2,tipo:$1,hijos:[$4]};$1.hijos.push(v);$$=$1;}
 	 |TVAR id LC {var v={nombre:$2,tipo:$1,hijos:[$3]};$$={nombre:'lpar',hijos:[v]};}
-	 |{$$={nombre:'lpar'};};
-ASIGNACION : id '=' EXP{$$ = {nombre:'asig',hijos:[$1,$3]};} ;	 
+	 |{$$={nombre:'lpar',hijos:[]};};
+ASIGNACION : LIDP '=' EXP{$$ = {nombre:'asig',hijos:[$1,$3]};} ;	 
 CUERPO : CUERPO SENT{$1.hijos.push($2);$$=$1;}
 		|SENT{$$={nombre:'cuerpo',hijos:[$1]};};
 SENT : DECVAR{$$=$1;}
@@ -167,7 +185,8 @@ SENT : DECVAR{$$=$1;}
 	 | LOOP {$$=$1;}
 	 | COUNT {$$=$1;}
 	 | DOWHILEX {$$=$1;}
-	 | REPEAT {$$=$1;};	
+	 | REPEAT {$$=$1;}
+	 | LLAMADO {$$=$1;};	
 IF : if '(' EXP ')' then '{' CUERPO '}' ELSE
 	 {
 	 $$={nombre:'if',hijos:[$3,$7]};
@@ -191,17 +210,41 @@ DEFECTO : default ':' CUERPO{$$={nombre:'default',hijos:[$3]};}
 	    |{$$=null;};
 WHILE : while '(' EXP ')' '{' CUERPO '}'{$$={nombre:'while',hijos:[$3,$6]};};
 DOWHILE : do '{' CUERPO '}' while '(' EXP ')'{$$={nombre:'dowhile',hijos:[$3,$7]};};
-REPEAT : repeat '{' CUERPO '}' until '(' EXP ')'{$$={nombre:'repeat',hijos:[$3,$6]};};
-FOR : for '(' VARFOR ';' EXP ';' id OPFOR ')' '{' CUERPO '}';
-VARFOR : id '=' EXP
-	   | tnum id '=' EXP;
-OPFOR : '+''+'
-	  | '-''-';
+REPEAT : repeat '{' CUERPO '}' until '(' EXP ')'{$$={nombre:'repeat',hijos:[$3,$7]};};
+FOR : for '(' VARFOR ';' EXP ';' OPFOR  '{' CUERPO '}'
+	{$$={nombre:'for',hijos:[$3,$5,$7,$9]};};
+VARFOR : ASIGNACION{$$=$1;}
+	   | tnum id '=' EXP
+	   {
+	   var v= {nombre:'lid',hijos:[$2]};
+	   $$={nombre:'dec',tipo:'tnum',hijos:[v,$4]};
+	   };
+OPFOR : id '+''+' ')'
+	  {	  
+	  var lidp ={nombre:'lidp',hijos:[$1]};
+	  var b={nombre:'valor',tipo:'num', valor : '1'};
+	  var suma={nombre:'+',hijos:[lidp,b]};
+	  $$ = {nombre:'asig',hijos:[lidp,suma]};
+	  }
+	  | id '-''-' ')'
+	  {	  
+	  var lidp ={nombre:'lidp',hijos:[$1]}	;
+	  var b={nombre:'valor',tipo:'num', valor : '1'};
+	  var resta={nombre:'-',hijos:[lidp,b]};
+	  $$ = {nombre:'asig',hijos:[lidp,resta]};
+	  };
 BREAK : break id{$$={nombre:'break',hijos:[$2]};}
-	  | break{$$={nombre:'break'};};
-RETURN : return EXP id{$$={nombre:'return',hijos:[$2]};}
-	   | return{$$={nombre:'return'};};
-LOOP : loop id '{' CUERPO '}'{$$={nombre:'loop',hijos:[$4]};};
+	  | break{$$={nombre:'break',hijos:[]};};
+RETURN : return EXP {$$={nombre:'return',hijos:[$2]};}
+	   | return{$$={nombre:'return',hijos:[]};};
+LOOP : loop id '{' CUERPO '}'{$$={nombre:'loop',valor:$2,hijos:[$4]};};
 COUNT : count '(' EXP ')' '{' CUERPO '}'{$$={nombre:'count',hijos:[$3,$6]};};
 DOWHILEX : do '{' CUERPO '}' whilex '(' EXP ',' EXP ')'{$$={nombre:'dowhilex',hijos:[$3,$7,$9]};};
-PRINCIPAL : principal '(' ')' '{' CUERPO '}';
+LLAMADO : LIDP '(' LPARFUN ')' ';'
+	    {
+	    $$={nombre:'llamado',hijos:[$1,$3]};
+	    };
+LPARFUN : LPARFUN ',' EXP {$1.hijos.push($2);$$=$1;}
+		|EXP {$$={nombre:'lparfun',hijos:[$1]};}
+		|{$$={nombre:'lparfun',hijos:[]};};
+PRINCIPAL : principal '(' ')' '{' CUERPO '}'{$$={nombre:'principal',hijos:[$5]};};

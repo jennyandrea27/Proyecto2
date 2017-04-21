@@ -4,12 +4,29 @@
 	<title>Avanzado</title>
 	<link rel="stylesheet" type="text/css" href="../bootstrap/css/bootstrap.css">
     <script src="../Analisis/Avanzado.js"></script>
-	<script src="../bootstrap/js/bootstrap.js"></script>
+	<script src="../bootstrap/js/bootstrap.min.js"></script>
 	<script src="../blockly/blockly_compressed.js"></script>
     <script src="../blockly/blocks_compressed.js"></script>
     <script src="../blockly/msg/js/es.js"></script>  
     <script src="../jquery-3.2.1.min.js"></script> 
     <script src="../blockly/javascript_compressed.js"></script>
+    <script type="text/javascript">
+		$(document).ready(function () {
+        $('#bAnalizar').click(function () {
+          try {          	
+            var result = Avanzado.parse($('#tbEntrada').val())            
+            alert('Analizado');
+            recorrido(result);
+            console.log(result)
+;
+          } catch (e) {
+            console.log(e);
+            alert('Error');
+          }
+        });
+      });
+	</script>
+    <script src="../Analisis/Recorrido.js"></script>
 </head>
 <body>
 	<ul class="nav nav-tabs" role="tablist">
@@ -27,22 +44,7 @@
 	              <h3 class="panel-title">Opciones</h3>
 	            </div>
 	            <div class="panel-body">	            
-					<button type="button" class="btn btn-info btn-block"  id="bAnalizar">Analizar</button>
-					<script type="text/javascript">
-						$(document).ready(function () {
-				        $('#bAnalizar').click(function () {
-				          try {          	
-				            var result = Avanzado.parse($('#tbEntrada').val())            
-				            alert('Analizado');
-				            console.log(result)
-;
-				          } catch (e) {
-				            console.log(e);
-				            alert('Error');
-				          }
-				        });
-				      });
-					</script>
+					<button type="button" class="btn btn-info btn-block"  id="bAnalizar">Analizar</button>					
 	            </div>
 	        </div>				
 	      	</div>
