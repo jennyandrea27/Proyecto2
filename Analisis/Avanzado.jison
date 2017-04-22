@@ -4,6 +4,8 @@
 \s+                   /* espacios en blanco se ignoran */
 \r                   /* espacios en blanco se ignoran */
 \n                   /* espacios en blanco se ignoran */
+"%%"[^\n]*\n         /*comentario de linea*/
+"¿¿"[^"??"]*"??"         /*comentario de parrafo*/
 [0-9]+("."[0-9]+)?\b  return 'num'
 \"[^\"]*\"|\'[^\']*\' yytext = yytext.substr(1,yyleng-2); return 'cad';
 "*"                   return '*'
@@ -22,6 +24,7 @@
 ";"                   return ';'
 ","                   return ','
 ".."                  return '..'
+"."                   return '.'
 "=="                  return '=='
 "="                   return '='
 "!="                  return '!='
@@ -71,6 +74,7 @@
 "getRandom"			  return 'getRandom'
 "getLength"			  return 'getLength'
 "throws"			  return 'throws'
+"NULL"				  return 'null'
 "NullPoinerException"			  return 'NullPoinerException'
 "MissingReturnStatement"	      return 'MissingReturnStatement'
 "ArithmeticException"			  return 'ArithmeticException'
@@ -142,15 +146,19 @@ EXP2 : EXP2 '+' EXP2 {$$={nombre:'+',hijos: [$1 , $3]};}
 	 | EXP2 '/' EXP2 {$$={nombre:'/',hijos: [$1 , $3]};}
 	 | EXP2 '%' EXP2 {$$={nombre:'%',hijos: [$1 , $3]};}
 	 | EXP2 '^' EXP2 {$$={nombre:'^',hijos: [$1 , $3]};}
+	 | '-' EXP2 {$$={nombre:'-',hijos: [$2]};}
 	 | EXP3 {$$=$1;};
 EXP3 : num {$$={nombre:'valor',tipo:'num', valor : $1};}
 	| true {$$={nombre:'valor',tipo:'bool', valor : 'true'};}
 	| false {$$={nombre:'valor',tipo:'bool', valor : 'false'};}
 	| LIDP {$$=$1;}
+	| LLAMADO {$$=$1;}
 	| cad {$$={nombre:'valor',tipo:'cad', valor : $1};}
-	| '(' EXP ')'{$$=$2;};       
+	| '(' EXP ')'{$$=$2;}
+	| null{$$={nombre:'null'};};
+
 LIDP : LIDP '.' id{$1.hijos.push($3);$$=$1;}
-	 | id{$$={nombre:'lidp',hijos:[$1]};};
+	 | id {$$={nombre:'lidp',hijos:[$1]};};
 DECFUN : TFUN LC ':' id '(' LPAR ')' '{' CUERPO '}'
 		{
 		$$={nombre:'decfun',tipo:$1,valor:$4,hijos:[]};
@@ -186,7 +194,7 @@ SENT : DECVAR{$$=$1;}
 	 | COUNT {$$=$1;}
 	 | DOWHILEX {$$=$1;}
 	 | REPEAT {$$=$1;}
-	 | LLAMADO {$$=$1;};	
+	 | LLAMADO ';' {$$=$1;};	
 IF : if '(' EXP ')' then '{' CUERPO '}' ELSE
 	 {
 	 $$={nombre:'if',hijos:[$3,$7]};
@@ -240,9 +248,9 @@ RETURN : return EXP {$$={nombre:'return',hijos:[$2]};}
 LOOP : loop id '{' CUERPO '}'{$$={nombre:'loop',valor:$2,hijos:[$4]};};
 COUNT : count '(' EXP ')' '{' CUERPO '}'{$$={nombre:'count',hijos:[$3,$6]};};
 DOWHILEX : do '{' CUERPO '}' whilex '(' EXP ',' EXP ')'{$$={nombre:'dowhilex',hijos:[$3,$7,$9]};};
-LLAMADO : LIDP '(' LPARFUN ')' ';'
+LLAMADO : id '(' LPARFUN ')' 
 	    {
-	    $$={nombre:'llamado',hijos:[$1,$3]};
+	    $$={nombre:'llamado',valor:$1,hijos:[$3]};
 	    };
 LPARFUN : LPARFUN ',' EXP {$1.hijos.push($2);$$=$1;}
 		|EXP {$$={nombre:'lparfun',hijos:[$1]};}
