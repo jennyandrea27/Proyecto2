@@ -153,7 +153,7 @@ EXP3 : num {$$={nombre:'valor',tipo:'num', valor : $1};}
 	| false {$$={nombre:'valor',tipo:'bool', valor : 'false'};}
 	| LIDP {$$=$1;}
 	| LLAMADO {$$=$1;}
-	| cad {$$={nombre:'valor',tipo:'cad', valor : $1};}
+	| cad {$$={nombre:'valor',tipo:'str', valor : $1};}
 	| '(' EXP ')'{$$=$2;}
 	| null{$$={nombre:'null'};};
 
