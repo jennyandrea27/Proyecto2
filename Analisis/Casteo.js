@@ -255,3 +255,242 @@ function menorigual(op1,op2) {
 		return insertarError(error);		
 	}
 }
+function and(exp) {
+	var temp={tipo:3,lv:[],lf:[]};		
+	if(exp.hijos[0].nombre === 'valor'){//es un valor puntual				
+		if(exp.hijos[0].tipo==='bool'){//es tipo bool
+		var lv1=genera_Etq();				
+		var lf1=genera_Etq();		
+			if(exp.hijos[0].valor === 'true'){//es verdadero
+				//construir if
+				cad_3d+='if (1 == 1) goto '+lv1+';\n';					
+			}else{
+				cad_3d+='if (1 == 0) goto '+lv1+';\n';
+			}
+			cad_3d+='goto '+lf1+';\n';					
+			temp.lf.push(lf1);
+		}else{
+			var tipo=valTipo(exp.hijos[0].tipo);
+			var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;;
+			return insertarError();
+		}
+	cad_3d+=lv1+':\n';
+	}else{//es una expresion
+		console.log("and exp")
+		var t1=evaluarExp(exp.hijos[0]);
+		console.log(t1);
+		if(t1.tipo!==3){//op2 no es tipo bool				
+			var tipo=valTipo(t1.tipo);
+			var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;;
+			return insertarError();
+		}
+		cad_3d+=t1.lv.join(':\n')+':\n';					
+		temp.lf=temp.lf.concat(t1.lf);										
+	}
+	//operando 2
+	if(exp.hijos[1].nombre === 'valor'){//es un valor puntual				
+		if(exp.hijos[1].tipo==='bool'){//es tipo bool
+		var lv2=genera_Etq();				
+		var lf2=genera_Etq();		
+			if(exp.hijos[1].valor === 'true'){//es verdadero
+				//construir if
+				cad_3d+='if (1 == 1) goto '+lv2+';\n';					
+			}else{
+				cad_3d+='if (1 == 0) goto '+lv2+';\n';
+			}
+			cad_3d+='goto '+lf2+';\n';
+			temp.lv.push(lv2);
+			temp.lf.push(lf2);
+		}else{
+			var tipo=valTipo(exp.hijos[1].tipo);
+			var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;;
+			return insertarError();
+		}		
+	}else{//es una expresion
+		var t2=evaluarExp(exp.hijos[1]);
+		if(t2.tipo!==3){//op2 no es tipo bool				
+			var tipo=valTipo(t2.tipo);
+			var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;
+			return insertarError();
+		}
+		temp.lv=temp.lv.concat(t2.lv);				
+		temp.lf=temp.lf.concat(t2.lf);
+	}
+	return temp;
+}
+function or(exp) {
+	var temp={tipo:3,lv:[],lf:[]};		
+	if(exp.hijos[0].nombre === 'valor'){//es un valor puntual				
+		if(exp.hijos[0].tipo==='bool'){//es tipo bool
+		var lv1=genera_Etq();				
+		var lf1=genera_Etq();		
+			if(exp.hijos[0].valor === 'true'){//es verdadero
+				//construir if
+				cad_3d+='if (1 == 1) goto '+lv1+';\n';					
+			}else{
+				cad_3d+='if (1 == 0) goto '+lv1+';\n';
+			}
+			cad_3d+='goto '+lf1+';\n';								
+			temp.lv.push(lv1);
+		}else{
+			var tipo=valTipo(exp.hijos[0].tipo);
+			var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;;
+			return insertarError();
+		}
+	cad_3d+=lf1+':\n';
+	}else{//es una expresion
+		var t1=evaluarExp(exp.hijos[0]);
+		if(t1.tipo!==3){//op2 no es tipo bool				
+			var tipo=valTipo(t1.tipo);
+			var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;;
+			return insertarError();
+		}
+		cad_3d+=t1.lf.join(':\n')+':\n';					
+		temp.lv=temp.lv.concat(t1.lv);										
+	}
+	//operando 2
+	if(exp.hijos[1].nombre === 'valor'){//es un valor puntual				
+		if(exp.hijos[1].tipo==='bool'){//es tipo bool
+		var lv2=genera_Etq();				
+		var lf2=genera_Etq();		
+			if(exp.hijos[1].valor === 'true'){//es verdadero
+				//construir if
+				cad_3d+='if (1 == 1) goto '+lv2+';\n';					
+			}else{
+				cad_3d+='if (1 == 0) goto '+lv2+';\n';
+			}
+			cad_3d+='goto '+lf2+';\n';
+			temp.lv.push(lv2);
+			temp.lf.push(lf2);
+		}else{
+			var tipo=valTipo(exp.hijos[1].tipo);
+			var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;;
+			return insertarError();
+		}		
+	}else{//es una expresion
+		var t2=evaluarExp(exp.hijos[1]);
+		if(t2.tipo!==3){//op2 no es tipo bool				
+			var tipo=valTipo(t2.tipo);
+			var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;
+			return insertarError();
+		}
+		temp.lv=temp.lv.concat(t2.lv);				
+		temp.lf=temp.lf.concat(t2.lf);
+	}
+	return temp;
+}
+function not(exp) {
+	//verificar si es valor puntual
+	var temp={tipo:3,lv:[],lf:[]};	
+	if(exp.nombre==='valor'){
+		if(exp.tipo==='bool'){
+			var lv1=genera_Etq();
+			var lf1=genera_Etq();			
+			if(exp.valor === 'true'){//es verdadero se hace falso
+				cad_3d+='if (1 == 1) goto '+lv1+';\n';					
+			}else{
+				cad_3d+='if (1 == 0) goto '+lv1+';\n';
+			}
+			cad_3d+='goto '+lf1+':\n';
+			temp.lv.push(lf1);
+			temp.lf.push(lv1);
+			return temp;		
+		}else{
+			var tipo=valTipo(exp.tipo);
+			var error='Error semantico, no puede evaluarse not con operador tipo '+tipo;		
+			return insertarError();
+		}
+	}else{//es una condicion que debe ser evaluada
+		var op1=evaluarExp(exp);
+		if(op1.tipo === 3){
+			//se intercambian etiquetas
+			temp.lv=op1.lf;
+			temp.lf=op1.lv;
+		}else{
+			var tipo=valTipo(exp.tipo);
+			var error='Error semantico, no puede evaluarse not con operador tipo '+tipo;		
+			return insertarError();
+		}		
+		return temp;
+	}
+}
+function xor(exp) {
+	var t1='';
+	var t2='';
+	var lcond2='';
+	var lverifica='';
+	if(exp.hijos[0].nombre==='valor'){
+		if(exp.hijos[0].tipo==='bool'){
+			var lv1=genera_Etq();
+			var lf1=genera_Etq();			
+			if(exp.hijos[0].valor === 'true'){//es verdadero se hace falso
+				cad_3d+='if (1 == 1) goto '+lv1+';\n';					
+			}else{
+				cad_3d+='if (1 == 0) goto '+lv1+';\n';
+			}
+			cad_3d+='goto '+lf1+':\n';
+			cad_3d+=lv1+':\n';
+			t1=genera_Temp();
+			cad_3d+=t1+'=1;\n';
+			lcond2=genera_Etq();
+			cad_3d+='goto '+lcond2+';\n';
+			cad_3d+=lf1+':\n';
+			cad_3d+=t1+'=0;\n';			
+		}else{
+			var tipo=valTipo(exp.tipo);
+			var error='Error semantico, no puede evaluarse not con operador tipo '+tipo;		
+			return insertarError();
+		}
+	}else{//es una condicion que debe ser evaluada
+		var op1=evaluarExp(exp.hijos[0]);	
+		//variable que indica si el resultado de la primera expresion fue verdadero
+		cad_3d+=op1.lv.join(':\n')+':\n';
+		t1=genera_Temp();
+		cad_3d+=t1+'=1;\n';
+		lcond2=genera_Etq();
+		cad_3d+='goto '+lcond2+';\n';
+		cad_3d+=op1.lf.join(':\n')+':\n';
+		cad_3d+=t1+'=0;\n';
+	}
+	cad_3d+=lcond2+':\n';
+	//evaluar hijo[1]
+	if(exp.hijos[1].nombre==='valor'){
+		if(exp.hijos[1].tipo==='bool'){
+			var lv2=genera_Etq();
+			var lf2=genera_Etq();			
+			if(exp.hijos[1].valor === 'true'){//es verdadero se hace falso
+				cad_3d+='if (1 == 1) goto '+lv2+';\n';					
+			}else{
+				cad_3d+='if (1 == 0) goto '+lv2+';\n';
+			}
+			cad_3d+='goto '+lf2+':\n';
+			cad_3d+=lv2+':\n';
+			t2=genera_Temp();
+			cad_3d+=t2+'=1;\n';
+			lverifica=genera_Etq();
+			cad_3d+='goto '+lverifica+';\n';
+			cad_3d+=lf2+':\n';
+			cad_3d+=t2+'=0;\n';			
+		}else{
+			var tipo=valTipo(exp.tipo);
+			var error='Error semantico, no puede evaluarse not con operador tipo '+tipo;		
+			return insertarError();
+		}
+	}else{//es una condicion que debe ser evaluada
+		var op2=evaluarExp(exp.hijos[1]);
+		cad_3d+=op2.lv.join(':\n')+':\n';
+		t2=genera_Temp();
+		cad_3d+=t2+'=1;\n';
+		lverifica=genera_Etq();
+		cad_3d+='goto '+lverifica+';\n';
+		cad_3d+=op2.lf.join(':\n')+':\n';
+		cad_3d+=t2+'=0;\n';
+	}
+	cad_3d+=lverifica+':\n';
+	var lv=genera_Etq();
+	var lf=genera_Etq();
+	cad_3d+='if ('+t1+'!='+t2+') goto '+lv+';\n';
+	cad_3d+='goto '+lf+';\n';
+	var temp={tipo:3,lv:[lv],lf:[lf]};
+	return temp;
+}

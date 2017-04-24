@@ -20,6 +20,7 @@ function recorrido(result) {
 	cont_temp=0;
 	cont_etq=0;
 	//tabla de simbolos
+	crearTablaSimbolos(result);
 	//buscar principal
 	var principal=buscar_principal(result);
 	//verificar si se declaro metodo principal
@@ -47,14 +48,21 @@ function ejecutar_Sent(cuerpo) {
 		console.log(sent);
 		switch(sent.nombre){
 		case 'dec':
+		cad_3d+='//declaracion de variable(s): ';
+		cad_3d+=sent.hijos[0].hijos.join()+'\n';
 		//hijo 0 tiene lidp
+		
 		//hijo 1 tiene expresion
+		cad_3d+='//evaluar expresion\n';
 		var res=evaluarExp(sent.hijos[1]);
 		console.log(res);
 		break;
 		case 'asig':
+		cad_3d+='//asignacion de variable: ';
+		cad_3d+=sent.hijos[0].hijos.join()+'\n';
 		//hijo 0 tiene lidp
 		//hijo 1 tiene expresion
+		cad_3d+='//evaluar expresion\n';
 		var res=evaluarExp(sent.hijos[1]);
 		console.log(res);
 		break;
@@ -78,7 +86,7 @@ function valTipo(tipo) {
 }
 function evaluarExp(exp) {
 	switch(exp.nombre){
-		case 'valor':
+		case 'valor':		
 		switch(exp.tipo){
 			case 'num':
 			var t=genera_Temp();
@@ -165,67 +173,27 @@ function evaluarExp(exp) {
 			var t2=evaluarExp(exp.hijos[1]);								
 			return menorigual(t1,t2);
 		case '&&':
-		var temp={tipo:3,lv:[],lf:[]};
-		console.log(exp.hijos[0]);
-			if(exp.hijos[0].nombre === 'valor'){//es un valor puntual				
-				if(exp.hijos[0].tipo==='bool'){//es tipo bool
-				var lv1=genera_Etq();				
-				var lf1=genera_Etq();		
-					if(exp.hijos[0].valor === 'true'){//es verdadero
-						//construir if
-						cad_3d+='if (1 == 1) goto '+lv1+';\n';					
-					}else{
-						cad_3d+='if (1 == 0) goto '+lv1+';\n';
-					}
-					cad_3d+='goto '+lf1+';\n';					
-					temp.lf.push(lf1);
-				}else{
-					var tipo=valTipo(exp.hijos[0].tipo);
-					var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;;
-					return insertarError();
-				}
-			cad_3d+=lv1+':\n';
-			}else{//es una expresion
-				var t1=evaluarExp(exp.hijos[0]);
-				if(t1.tipo!==3){//op2 no es tipo bool				
-					var tipo=valTipo(t1.tipo);
-					var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;;
-					return insertarError();
-				}
-				cad_3d+=t1.lv.join(':\n')+':\n';					
-				temp.lf=temp.lf.concat(t1.lf);										
-			}
-			//operando 2
-			if(exp.hijos[1].nombre === 'valor'){//es un valor puntual				
-				if(exp.hijos[1].tipo==='bool'){//es tipo bool
-				var lv2=genera_Etq();				
-				var lf2=genera_Etq();		
-					if(exp.hijos[1].valor === 'true'){//es verdadero
-						//construir if
-						cad_3d+='if (1 == 1) goto '+lv2+';\n';					
-					}else{
-						cad_3d+='if (1 == 0) goto '+lv2+';\n';
-					}
-					cad_3d+='goto '+lf2+';\n';
-					temp.lv.push(lv2);
-					temp.lf.push(lf2);
-				}else{
-					var tipo=valTipo(exp.hijos[1].tipo);
-					var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;;
-					return insertarError();
-				}		
-			}else{//es una expresion
-				var t2=evaluarExp(exp.hijos[1]);
-				if(t2.tipo!==3){//op2 no es tipo bool				
-					var tipo=valTipo(t2.tipo);
-					var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;;
-					return insertarError();
-				}
-				temp.lv=temp.lv.concat(t2.lv);				
-				temp.lf=temp.lf.concat(t2.lf);
-			}
-			return temp;
-			
+			return and(exp);
+		case '||':
+			return or(exp);
+		case '!':			
+			return not(exp.hijos[0]);
+		case '&?':
+			var a=and(exp);
+			//se intercambian etiquetas de expresion evaluada 
+			var lv=a.lf;
+			a.lf=a.lv;
+			a.lv=lv;
+			return a;
+		case '|?':
+			var o=or(exp);
+			//se intercambian etiquetas de expresion evaluada 
+			var lv=o.lf;
+			o.lf=o.lv;
+			o.lv=lv;
+			return o;
+		case '|&':
+			return xor(exp);
 	}
 	return exp;
 }

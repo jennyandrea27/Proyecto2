@@ -35,6 +35,7 @@
 "||"                  return '||'
 "|?"                  return '|?'
 "&&"                  return '&&'
+"&?"                  return '&?'
 "||"                  return '||'
 "|&"                  return '|&'
 "!"                   return '!'
@@ -131,7 +132,7 @@ EXP : EXP '||' EXP {$$={nombre:'||',hijos: [$1 , $3]};}
 	| EXP '|&' EXP {$$={nombre:'|&',hijos: [$1 , $3]};}
 	| EXP '&?' EXP {$$={nombre:'&?',hijos: [$1 , $3]};}
 	| EXP '|?' EXP {$$={nombre:'|?',hijos: [$1 , $3]};}
-	| EXP '!' EXP {$$={nombre:'!',hijos: [$1 , $3]};}
+	| '!' EXP {$$={nombre:'!',hijos: [$2]};}
 	| EXP1{$$=$1;};
 EXP1 : EXP1 '==' EXP1 {$$={nombre:'==',hijos: [$1 , $3]};}
 	| EXP1 '!=' EXP1 {$$={nombre:'!=',hijos: [$1 , $3]};}
