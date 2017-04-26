@@ -113,16 +113,16 @@ BSENT : DECVAR {$$=$1;}
 	   | DECARR {$$=$1;}
 	   | PRINCIPAL{$$=$1;};
 DECVAR : TVAR LIDC VALVAR ';' {$$={nombre:'dec',tipo:$1,hijos:[$2,$3]};};
-TVAR : tbool {$$='tbool';}
-	  |tnum {$$='tnum';}
-	  |tstr {$$='tstr'}
+TVAR : tbool {$$='bool';}
+	  |tnum {$$='num';}
+	  |tstr {$$='str'}
 	  |LIDP {$$=$1;};
 LIDC : LIDC ',' id {$1.hijos.push($3);$$=$1;}
 	 | id {$$={nombre:'lid',hijos:[$1]};};
 VALVAR : ':' EXP {$$=$2;}
        | {$$=null;};
 DECARR : array ':' id LCV of TVAR ';'{$$={nombre:'array',tipo:$6,valor:$3,hijos:[$4]};};
-LCV : LCV '[' INDICE ']'{$1.hijos.push($3);$$=$1;}	
+LCV : LCV '[' INDICE ']'{$1.hijos.push($3);$$=$1;}
 	| '[' INDICE ']'{$$={nombre:'lcv',hijos:[$2]};};
 INDICE : num '..' num {$$={nombre:'indice',inf:$1,sup:$3};}
 	   | num {$$={nombre:'indice',inf:0,sup:$1};}
@@ -177,7 +177,7 @@ LC : LCV {$$=$1;}
 LPAR :LPAR ',' TVAR id LC {var v={nombre:$2,tipo:$1,hijos:[$4]};$1.hijos.push(v);$$=$1;}
 	 |TVAR id LC {var v={nombre:$2,tipo:$1,hijos:[$3]};$$={nombre:'lpar',hijos:[v]};}
 	 |{$$={nombre:'lpar',hijos:[]};};
-ASIGNACION : LIDP '=' EXP{$$ = {nombre:'asig',hijos:[$1,$3]};} ;	 
+ASIGNACION : LIDP '=' EXP{$$ = {nombre:'asig',hijos:[$1,$3]};} ;
 CUERPO : CUERPO SENT{$1.hijos.push($2);$$=$1;}
 		|SENT{$$={nombre:'cuerpo',hijos:[$1]};};
 SENT : DECVAR{$$=$1;}
@@ -195,7 +195,7 @@ SENT : DECVAR{$$=$1;}
 	 | COUNT {$$=$1;}
 	 | DOWHILEX {$$=$1;}
 	 | REPEAT {$$=$1;}
-	 | LLAMADO ';' {$$=$1;};	
+	 | LLAMADO ';' {$$=$1;};
 IF : if '(' EXP ')' then '{' CUERPO '}' ELSE
 	 {
 	 $$={nombre:'if',hijos:[$3,$7]};
@@ -229,14 +229,14 @@ VARFOR : ASIGNACION{$$=$1;}
 	   $$={nombre:'dec',tipo:'tnum',hijos:[v,$4]};
 	   };
 OPFOR : id '+''+' ')'
-	  {	  
+	  {
 	  var lidp ={nombre:'lidp',hijos:[$1]};
 	  var b={nombre:'valor',tipo:'num', valor : '1'};
 	  var suma={nombre:'+',hijos:[lidp,b]};
 	  $$ = {nombre:'asig',hijos:[lidp,suma]};
 	  }
 	  | id '-''-' ')'
-	  {	  
+	  {
 	  var lidp ={nombre:'lidp',hijos:[$1]}	;
 	  var b={nombre:'valor',tipo:'num', valor : '1'};
 	  var resta={nombre:'-',hijos:[lidp,b]};
@@ -249,7 +249,7 @@ RETURN : return EXP {$$={nombre:'return',hijos:[$2]};}
 LOOP : loop id '{' CUERPO '}'{$$={nombre:'loop',valor:$2,hijos:[$4]};};
 COUNT : count '(' EXP ')' '{' CUERPO '}'{$$={nombre:'count',hijos:[$3,$6]};};
 DOWHILEX : do '{' CUERPO '}' whilex '(' EXP ',' EXP ')'{$$={nombre:'dowhilex',hijos:[$3,$7,$9]};};
-LLAMADO : id '(' LPARFUN ')' 
+LLAMADO : id '(' LPARFUN ')'
 	    {
 	    $$={nombre:'llamado',valor:$1,hijos:[$3]};
 	    };

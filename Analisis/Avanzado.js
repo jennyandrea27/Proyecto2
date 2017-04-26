@@ -101,13 +101,13 @@ case 8:
 this.$={nombre:'dec',tipo:$$[$0-3],hijos:[$$[$0-2],$$[$0-1]]};
 break;
 case 9:
-this.$='tbool';
+this.$='bool';
 break;
 case 10:
-this.$='tnum';
+this.$='num';
 break;
 case 11:
-this.$='tstr'
+this.$='str'
 break;
 case 13: case 53:
 $$[$0-2].hijos.push($$[$0]);this.$=$$[$0-2];
@@ -293,7 +293,7 @@ case 99:
 	   
 break;
 case 100:
-	  
+
 	  var lidp ={nombre:'lidp',hijos:[$$[$0-3]]};
 	  var b={nombre:'valor',tipo:'num', valor : '1'};
 	  var suma={nombre:'+',hijos:[lidp,b]};
@@ -301,7 +301,7 @@ case 100:
 	  
 break;
 case 101:
-	  
+
 	  var lidp ={nombre:'lidp',hijos:[$$[$0-3]]}	;
 	  var b={nombre:'valor',tipo:'num', valor : '1'};
 	  var resta={nombre:'-',hijos:[lidp,b]};

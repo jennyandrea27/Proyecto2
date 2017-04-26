@@ -12,7 +12,7 @@ function genera_Etq() {
 }
 function insertarError(error) {
 	Errores.push(error);
-	return {temp:'tn',tipo:100,etq:'Ln'};	
+	return {temp:'tn',tipo:100,etq:'Ln'};
 }
 function recorrido(result) {
 	//limpiar cad_3d y temporales
@@ -20,6 +20,7 @@ function recorrido(result) {
 	cont_temp=0;
 	cont_etq=0;
 	//tabla de simbolos
+	TablaSimbolos=[];
 	crearTablaSimbolos(result);
 	//buscar principal
 	var principal=buscar_principal(result);
@@ -45,13 +46,12 @@ function ejecutar_Sent(cuerpo) {
 	//recorrer los hijos del cuerpo
 	for(var i = 0; i< cuerpo.hijos.length;i++){
 		var sent=cuerpo.hijos[i];
-		console.log(sent);
 		switch(sent.nombre){
 		case 'dec':
 		cad_3d+='//declaracion de variable(s): ';
 		cad_3d+=sent.hijos[0].hijos.join()+'\n';
 		//hijo 0 tiene lidp
-		
+
 		//hijo 1 tiene expresion
 		cad_3d+='//evaluar expresion\n';
 		var res=evaluarExp(sent.hijos[1]);
@@ -68,7 +68,7 @@ function ejecutar_Sent(cuerpo) {
 		break;
 		}
 	}
-	
+
 
 }
 function valTipo(tipo) {
@@ -82,11 +82,26 @@ function valTipo(tipo) {
 		case -100:
 		return 'error';
 	}
-	return -1;
+	return '';
+}
+function cadTipo(tipo) {
+	switch (tipo) {
+		case 'num':
+			return 1;
+		case 'bool':
+			return 3;
+		case 'str':
+			return 7;
+		case 'error':
+			return -1;
+		default:
+			return-1;
+	}
+
 }
 function evaluarExp(exp) {
 	switch(exp.nombre){
-		case 'valor':		
+		case 'valor':
 		switch(exp.tipo){
 			case 'num':
 			var t=genera_Temp();
@@ -106,27 +121,27 @@ function evaluarExp(exp) {
 		}
 		case 'lidp':
 		//acceder a id en tabla de simbolos
-		break;		
+		break;
 		case '+':
 		var t1=evaluarExp(exp.hijos[0]);
 		var t2=evaluarExp(exp.hijos[1]);
-		return suma(t1,t2);		
+		return suma(t1,t2);
 		case '*':
 		var t1=evaluarExp(exp.hijos[0]);
 		var t2=evaluarExp(exp.hijos[1]);
-		return mult(t1,t2);		
+		return mult(t1,t2);
 		case '/':
 		var t1=evaluarExp(exp.hijos[0]);
 		var t2=evaluarExp(exp.hijos[1]);
-		return div(t1,t2);	
+		return div(t1,t2);
 		case '%':
 		var t1=evaluarExp(exp.hijos[0]);
 		var t2=evaluarExp(exp.hijos[1]);
-		return modulo(t1,t2);	
+		return modulo(t1,t2);
 		case '^':
 		var t1=evaluarExp(exp.hijos[0]);
 		var t2=evaluarExp(exp.hijos[1]);
-		return potencia(t1,t2);	
+		return potencia(t1,t2);
 		case '-':
 		if(exp.hijos.length === 1){
 			var t=genera_Temp();
@@ -137,57 +152,57 @@ function evaluarExp(exp) {
 				//error semantico
 				var error='Error semantico, no se puede realizar resta unaria de tipo STR.';
 				return insertarError(error);
-			}else{		
-				cad_3d+=t+"=-"+t1.temp+";\n";						
+			}else{
+				cad_3d+=t+"=-"+t1.temp+";\n";
 				var temp={tipo:t1.tipo,temp:t};
 				return temp;
 			}
 		}else{
 			//obtener temporales de operandos
 			var t1=evaluarExp(exp.hijos[0]);
-			var t2=evaluarExp(exp.hijos[1]);								
-			return resta(t1,t2);			
+			var t2=evaluarExp(exp.hijos[1]);
+			return resta(t1,t2);
 		}
 		case '==':
 			var t1=evaluarExp(exp.hijos[0]);
-			var t2=evaluarExp(exp.hijos[1]);								
+			var t2=evaluarExp(exp.hijos[1]);
 			return igualacion(t1,t2);
 		case '!=':
 			var t1=evaluarExp(exp.hijos[0]);
-			var t2=evaluarExp(exp.hijos[1]);								
+			var t2=evaluarExp(exp.hijos[1]);
 			return diferencia(t1,t2);
 		case '>':
 			var t1=evaluarExp(exp.hijos[0]);
-			var t2=evaluarExp(exp.hijos[1]);								
+			var t2=evaluarExp(exp.hijos[1]);
 			return mayor(t1,t2);
 		case '<':
 			var t1=evaluarExp(exp.hijos[0]);
-			var t2=evaluarExp(exp.hijos[1]);								
+			var t2=evaluarExp(exp.hijos[1]);
 			return menor(t1,t2);
 		case '>=':
 			var t1=evaluarExp(exp.hijos[0]);
-			var t2=evaluarExp(exp.hijos[1]);								
-			return mayorigual(t1,t2);				
+			var t2=evaluarExp(exp.hijos[1]);
+			return mayorigual(t1,t2);
 		case '<=':
 			var t1=evaluarExp(exp.hijos[0]);
-			var t2=evaluarExp(exp.hijos[1]);								
+			var t2=evaluarExp(exp.hijos[1]);
 			return menorigual(t1,t2);
 		case '&&':
 			return and(exp);
 		case '||':
 			return or(exp);
-		case '!':			
+		case '!':
 			return not(exp.hijos[0]);
 		case '&?':
 			var a=and(exp);
-			//se intercambian etiquetas de expresion evaluada 
+			//se intercambian etiquetas de expresion evaluada
 			var lv=a.lf;
 			a.lf=a.lv;
 			a.lv=lv;
 			return a;
 		case '|?':
 			var o=or(exp);
-			//se intercambian etiquetas de expresion evaluada 
+			//se intercambian etiquetas de expresion evaluada
 			var lv=o.lf;
 			o.lf=o.lv;
 			o.lv=lv;
