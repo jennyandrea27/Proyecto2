@@ -21,6 +21,9 @@ function recorrido(result) {
 	cont_etq=0;
 	//tabla de simbolos
 	TablaSimbolos=[];
+	//agregar ambito global
+	var global=crearAmbito('global',0);
+	insertarAmbito(global);
 	crearTablaSimbolos(result);
 	//buscar principal
 	var principal=buscar_principal(result);
@@ -79,6 +82,8 @@ function valTipo(tipo) {
 		return 'bool';
 		case 7:
 		return 'str';
+		case 11:
+		return 'void'
 		case -100:
 		return 'error';
 	}
@@ -92,8 +97,10 @@ function cadTipo(tipo) {
 			return 3;
 		case 'str':
 			return 7;
+		case 'void':
+			return 11;
 		case 'error':
-			return -1;
+			return -100;
 		default:
 			return-1;
 	}

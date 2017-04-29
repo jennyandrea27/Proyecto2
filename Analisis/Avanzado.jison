@@ -163,18 +163,17 @@ LIDP : LIDP '.' id{$1.hijos.push($3);$$=$1;}
 DECFUN : TFUN LC ':' id '(' LPAR ')' '{' CUERPO '}'
 		{
 		$$={nombre:'decfun',tipo:$1,valor:$4,hijos:[]};
-		if($2 !== null){
-		$$.hijos.push($2);
-		}else{
 		$$.hijos.push($6);
 		$$.hijos.push($9);
+		if($2 !== null){
+		$$.hijos.push($2);
 		}
 		};
 TFUN : TVAR {$$=$1;}
-	  |tvoid{$$='tvoid'};
+	  |tvoid{$$='void'};
 LC : LCV {$$=$1;}
 	| {$$=null;};
-LPAR :LPAR ',' TVAR id LC {var v={nombre:$2,tipo:$1,hijos:[$4]};$1.hijos.push(v);$$=$1;}
+LPAR :LPAR ',' TVAR id LC {var v={nombre:$4,tipo:$3,hijos:[$5]};$1.hijos.push(v);$$=$1;}
 	 |TVAR id LC {var v={nombre:$2,tipo:$1,hijos:[$3]};$$={nombre:'lpar',hijos:[v]};}
 	 |{$$={nombre:'lpar',hijos:[]};};
 ASIGNACION : LIDP '=' EXP{$$ = {nombre:'asig',hijos:[$1,$3]};} ;

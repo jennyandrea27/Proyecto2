@@ -217,19 +217,18 @@ break;
 case 55:
 
 		this.$={nombre:'decfun',tipo:$$[$0-9],valor:$$[$0-6],hijos:[]};
-		if($$[$0-8] !== null){
-		this.$.hijos.push($$[$0-8]);
-		}else{
 		this.$.hijos.push($$[$0-4]);
 		this.$.hijos.push($$[$0-1]);
+		if($$[$0-8] !== null){
+		this.$.hijos.push($$[$0-8]);
 		}
 		
 break;
 case 57:
-this.$='tvoid'
+this.$='void'
 break;
 case 60:
-var v={nombre:$$[$0-3],tipo:$$[$0-4],hijos:[$$[$0-1]]};$$[$0-4].hijos.push(v);this.$=$$[$0-4];
+var v={nombre:$$[$0-1],tipo:$$[$0-2],hijos:[$$[$0]]};$$[$0-4].hijos.push(v);this.$=$$[$0-4];
 break;
 case 61:
 var v={nombre:$$[$0-1],tipo:$$[$0-2],hijos:[$$[$0]]};this.$={nombre:'lpar',hijos:[v]};
