@@ -43,7 +43,6 @@
 "str"				  return 'tstr'
 "num"				  return 'tnum'
 "void"				  return 'tvoid'
-"if"				  return 'if'
 "num"				  return 'tnum'
 "array"				  return 'array'
 "of"				  return 'of'
@@ -219,28 +218,14 @@ DEFECTO : default ':' CUERPO{$$={nombre:'default',hijos:[$3]};}
 WHILE : while '(' EXP ')' '{' CUERPO '}'{$$={nombre:'while',hijos:[$3,$6]};};
 DOWHILE : do '{' CUERPO '}' while '(' EXP ')'{$$={nombre:'dowhile',hijos:[$3,$7]};};
 REPEAT : repeat '{' CUERPO '}' until '(' EXP ')'{$$={nombre:'repeat',hijos:[$3,$7]};};
-FOR : for '(' VARFOR ';' EXP ';' OPFOR  '{' CUERPO '}'
+FOR : for '(' VARFOR EXP ';' ASIGNACION ')' '{' CUERPO '}'
 	{$$={nombre:'for',hijos:[$3,$5,$7,$9]};};
-VARFOR : ASIGNACION{$$=$1;}
-	   | tnum id '=' EXP
+VARFOR : ASIGNACION ';'{$$=$1;}
+	   | tnum id '=' EXP ';'
 	   {
 	   var v= {nombre:'lid',hijos:[$2]};
 	   $$={nombre:'dec',tipo:'tnum',hijos:[v,$4]};
 	   };
-OPFOR : id '+''+' ')'
-	  {
-	  var lidp ={nombre:'lidp',hijos:[$1]};
-	  var b={nombre:'valor',tipo:'num', valor : '1'};
-	  var suma={nombre:'+',hijos:[lidp,b]};
-	  $$ = {nombre:'asig',hijos:[lidp,suma]};
-	  }
-	  | id '-''-' ')'
-	  {
-	  var lidp ={nombre:'lidp',hijos:[$1]}	;
-	  var b={nombre:'valor',tipo:'num', valor : '1'};
-	  var resta={nombre:'-',hijos:[lidp,b]};
-	  $$ = {nombre:'asig',hijos:[lidp,resta]};
-	  };
 BREAK : break id{$$={nombre:'break',hijos:[$2]};}
 	  | break{$$={nombre:'break',hijos:[]};};
 RETURN : return EXP {$$={nombre:'return',hijos:[$2]};}

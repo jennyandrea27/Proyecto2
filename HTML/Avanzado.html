@@ -7,17 +7,18 @@
 	<script src="../bootstrap/js/bootstrap.min.js"></script>
 	<script src="../blockly/blockly_compressed.js"></script>
     <script src="../blockly/blocks_compressed.js"></script>
-    <script src="../blockly/msg/js/es.js"></script>  
-    <script src="../jquery-3.2.1.min.js"></script> 
+    <script src="../blockly/msg/js/es.js"></script>
+    <script src="../jquery-3.2.1.min.js"></script>
     <script src="../blockly/javascript_compressed.js"></script>
+		<script src="../Analisis/Constante.js"></script>
     <script src="../Analisis/Recorrido.js"></script>
     <script src="../Analisis/Casteo.js"></script>
     <script src="../Analisis/TablaSimbolos.js"></script>
     <script type="text/javascript">
 		$(document).ready(function () {
         $('#bAnalizar').click(function () {
-          try {          	
-            var result = Avanzado.parse($('#tbEntrada').val())            
+          try {
+            var result = Avanzado.parse($('#tbEntrada').val())
             alert('Analizado');
             recorrido(result);
             console.log(result)
@@ -29,7 +30,7 @@
         });
       });
 	</script>
-    
+
 </head>
 <body>
 	<ul class="nav nav-tabs" role="tablist">
@@ -40,38 +41,38 @@
 	</ul>
 	<br/>
 	<div class="container">
-		<div class="row">			
+		<div class="row">
 			<div class="col-md-2"><!--OPCIONES-->
 			<div class="panel panel-success">
 	            <div class="panel-heading">
 	              <h3 class="panel-title">Opciones</h3>
 	            </div>
-	            <div class="panel-body">	            
-					<button type="button" class="btn btn-info btn-block"  id="bAnalizar">Analizar</button>					
+	            <div class="panel-body">
+					<button type="button" class="btn btn-info btn-block"  id="bAnalizar">Analizar</button>
 	            </div>
-	        </div>				
+	        </div>
 	      	</div>
 	      	<div class="col-md-6"><!--EDITOR-->
 			<div class="panel panel-success">
 	            <div class="panel-heading">
 	              <h3 class="panel-title">Editor</h3>
 	            </div>
-	            <div class="panel-body">	            
+	            <div class="panel-body">
 					<textarea id="tbEntrada" style="height: 600px; width: 100%"></textarea>
 	            </div>
-	        </div>				
+	        </div>
 	      	</div>
 	      <div class="col-md-4"><!--ESTRUCTURAS-->
 	      	<div class="panel panel-success">
 	            <div class="panel-heading">
 	              <h3 class="panel-title">Estructuras</h3>
 	            </div>
-	            <div class="panel-body">	            
+	            <div class="panel-body">
 					<textarea id="tbEstructuras" style="height: 600px; width: 100%"></textarea>
 	            </div>
 	        </div>
-	      </div>	      	     	      
-      </div>   
+	      </div>
+      </div>
     </div>
 </body>
 </html>

@@ -41,13 +41,10 @@ function crearTablaSimbolos(cuerpo) {
 				var sup=lcv.hijos[k].sup;
 				tam=tam*(sup-inf);
 			}
-			console.log(tam);
 			var var_arr=crearVariable(nombre,amb.variables.length,tipo,tam,amb.nombre,lcv);
 			insertarVar(var_arr,amb);
 			break;
 			case "decfun":
-			console.log('decfun');
-			console.log(sent);
 			//se crea ambito de funciones
 			var tipo_fun=cadTipo(sent.tipo);
 			var amb_fun=crearAmbito(getAmbito()+'$'+sent.valor,tipo_fun);
@@ -99,8 +96,13 @@ function crearTablaSimbolos(cuerpo) {
 			break;
 			case 'principal':
 			//crear ambito para principal
-			var amb_principal=crearAmbito('principal',11);//es tipo void
-
+			var amb_principal=crearAmbito(getAmbito()+'$principal',11);//es tipo void
+			//se agrega ambito a ambito en tabla de simbolos
+			TablaSimbolos[TablaSimbolos.length-1].ambitos.push(amb_principal);
+			ambito.push('principal');
+			crearTablaSimbolos(sent.hijos[0]);
+			ambito.pop();
+			console.log(TablaSimbolos);
 			break;
 			case 'if':
 			//crear ambito para if
@@ -130,17 +132,41 @@ function crearTablaSimbolos(cuerpo) {
 				ambito.pop();
 			}
 			break;
-			case '':
+			case 'while':
+			case 'dowhile':
+			case 'repeat':
+			case 'loop':
+			case 'count':
+			case 'dowhilex':
 			//crear ambito para la sentencia
-			amb_sent=crearAmbito(getAmbito()+sent.nombre+i,-1);
+			amb_sent=crearAmbito(getAmbito()+'$'+sent.nombre+i,-1);
 			//buscar ambito padre
-			nomb_amb_padre=ambito[ambito.length-1];
-			amb_padre=buscarAmbito(TablaSimbolos[TablaSimbolos.length-1],nomb_amb_padre);
+			amb_padre=buscarAmbito(TablaSimbolos[TablaSimbolos.length-1],getAmbito());
 			//se agrega ambito a ambito en tabla de simbolos
 			amb_padre.ambitos.push(amb_sent);
-			ambito.push(amb_sent.nombre);
+			ambito.push(sent.nombre+i);
 			//buscar el cuerpo de la sentencia
 			cuerpo_sent=buscarCuerpo(sent);
+			crearTablaSimbolos(cuerpo_sent);
+			ambito.pop();
+			break;
+			case 'for':
+			//crear ambito para la sentencia
+			amb_sent=crearAmbito(getAmbito()+'$'+sent.nombre+i,-1);
+			//buscar ambito padre
+			amb_padre=buscarAmbito(TablaSimbolos[TablaSimbolos.length-1],getAmbito());
+			//se agrega ambito a ambito en tabla de simbolos
+			amb_padre.ambitos.push(amb_sent);
+			ambito.push(sent.nombre+i);
+			//verificar si la variable de control es una asignacion
+			if(sent.hijos[0].nombre===Constante.dec){
+				var n_v_for=sent.hijos[0].hijos[0].hijos[0];
+				var v_for=crearVariable(n_v_for,amb_sent.variables.length,sent.hijos[0].tipo,1,amb_sent.nombre,null);
+				//insertar varible
+				insertarVar(v_for,amb_sent);
+			}
+			//buscar el cuerpo de la sentencia
+			cuerpo_sent=buscarCuerpo(sent);			
 			crearTablaSimbolos(cuerpo_sent);
 			ambito.pop();
 			break;

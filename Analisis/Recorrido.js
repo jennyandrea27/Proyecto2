@@ -21,6 +21,7 @@ function recorrido(result) {
 	cont_etq=0;
 	//tabla de simbolos
 	TablaSimbolos=[];
+	ambito=['global'];
 	//agregar ambito global
 	var global=crearAmbito('global',0);
 	insertarAmbito(global);
