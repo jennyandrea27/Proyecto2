@@ -200,11 +200,11 @@ function menor(op1,op2) {
 		case 14://str con str
 		//comparacion de cadenas
 		break;
-		case 6: // bool con bool
-		case 4: //num con bool
-		case 8://str con num
-		case 10://bool con str
 		default:
+		// case 6: // bool con bool
+		// case 4: //num con bool
+		// case 8://str con num
+		// case 10://bool con str
 		//error
 		var tipo1=valTipo(op1.tipo);
 		var tipo2=valTipo(op2.tipo);

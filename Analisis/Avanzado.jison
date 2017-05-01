@@ -219,7 +219,7 @@ WHILE : while '(' EXP ')' '{' CUERPO '}'{$$={nombre:'while',hijos:[$3,$6]};};
 DOWHILE : do '{' CUERPO '}' while '(' EXP ')'{$$={nombre:'dowhile',hijos:[$3,$7]};};
 REPEAT : repeat '{' CUERPO '}' until '(' EXP ')'{$$={nombre:'repeat',hijos:[$3,$7]};};
 FOR : for '(' VARFOR EXP ';' ASIGNACION ')' '{' CUERPO '}'
-	{$$={nombre:'for',hijos:[$3,$5,$7,$9]};};
+	{$$={nombre:'for',hijos:[$3,$4,$6,$9]};};
 VARFOR : ASIGNACION ';'{$$=$1;}
 	   | tnum id '=' EXP ';'
 	   {

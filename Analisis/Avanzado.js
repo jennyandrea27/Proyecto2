@@ -283,7 +283,7 @@ case 96:
 this.$={nombre:'repeat',hijos:[$$[$0-5],$$[$0-1]]};
 break;
 case 97:
-this.$={nombre:'for',hijos:[$$[$0-7],$$[$0-5],$$[$0-3],$$[$0-1]]};
+this.$={nombre:'for',hijos:[$$[$0-7],$$[$0-6],$$[$0-4],$$[$0-1]]};
 break;
 case 99:
 
