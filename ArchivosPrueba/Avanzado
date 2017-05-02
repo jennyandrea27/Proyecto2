@@ -25,3 +25,35 @@ Principal(){
     a = 3 * 8 ;
 }  until(2<5)
 }
+
+Principal(){
+  num a : 40 * 8;
+ loop ciclo {
+    a = 3 * 8 ;
+  }
+}
+
+Principal(){
+  num a : 40 * 8;
+  a = 3 * 8 ^ 6 +3 -7 / (-3 + 6);
+  for(num i : 0; i<5; i = i + 3){
+    str x:"hola";
+    if(4>0 && 8 < 99*8) then {
+      a = 3 * 8 ^ 6 +3 -7 / (-3 + 6);
+    }else{
+      bool flag : true;
+    }
+  }
+}
+str : funcion(num par1, num par3){
+  num a : 40 * 8;
+  a = 3 * 8 ^ 6 +3 -7 / (-3 + 6);
+  for(num i : 0; 3<5; i = 4 + 3){
+    str x:"hola";
+    if(4>0 && 8 < 99*8) then {
+      a = 3 * 8 ^ 6 +3 -7 / (-3 + 6);
+    }else{
+      bool flag : true;
+    }
+  }
+}

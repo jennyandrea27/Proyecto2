@@ -1,5 +1,6 @@
 var TablaSimbolos=[];
 var ambito=['global'];
+var tabla_html='';
 //la tabla de simbolos almacena objetos con los siguientes atributos
 //nombre, pos, tam, ambito, tipo, rol y dim
 function crearTablaSimbolos(cuerpo) {
@@ -47,7 +48,7 @@ function crearTablaSimbolos(cuerpo) {
 			case "decfun":
 			//se crea ambito de funciones
 			var tipo_fun=cadTipo(sent.tipo);
-			var amb_fun=crearAmbito(getAmbito()+'$'+sent.valor,tipo_fun);
+			var amb_fun=crearAmbito(getAmbito()+'$'+sent.valor,tipo_fun,'funcion');
 			var dim_ret=null;
 			//en el hijo 2 puede tener corchetes
 			if(sent.hijos.length===3){
@@ -76,6 +77,7 @@ function crearTablaSimbolos(cuerpo) {
 			}
 			//se inserta una variabla para retorno
 			var ret=crearVariable('retorno',0,tipo_fun,1,amb_fun.nombre,dim_ret);
+			ret.rol='retorno';
 			insertarVar(ret,amb_fun);
 			//se recorre lista de parametros para agregarlos al ambito
 			//hijos 0 tiene lpar
@@ -96,7 +98,7 @@ function crearTablaSimbolos(cuerpo) {
 			break;
 			case 'principal':
 			//crear ambito para principal
-			var amb_principal=crearAmbito(getAmbito()+'$principal',11);//es tipo void
+			var amb_principal=crearAmbito(getAmbito()+'$principal',11,'funcion');//es tipo void
 			//se agrega ambito a ambito en tabla de simbolos
 			TablaSimbolos[TablaSimbolos.length-1].ambitos.push(amb_principal);
 			ambito.push('principal');
@@ -106,7 +108,7 @@ function crearTablaSimbolos(cuerpo) {
 			break;
 			case 'if':
 			//crear ambito para if
-			var amb_sent=crearAmbito(getAmbito()+'$'+sent.nombre+i,-1);
+			var amb_sent=crearAmbito(getAmbito()+'$'+sent.nombre+i,-1,sent.nombre);
 			//buscar ambito padre
 			var nomb_amb_padre=ambito.join('$');
 			console.log(nomb_amb_padre);
@@ -120,7 +122,7 @@ function crearTablaSimbolos(cuerpo) {
 			ambito.pop();
 			//verificar si tiene else
 			if(sent.hijos.length===3){
-				var amb_else=crearAmbito(getAmbito()+'$else'+i,-1);
+				var amb_else=crearAmbito(getAmbito()+'$else'+i,-1,'else');
 				nomb_amb_padre=ambito.join('$');
 				amb_padre=buscarAmbito(TablaSimbolos[0],nomb_amb_padre);
 				//se agrega ambito a ambito en tabla de simbolos
@@ -139,7 +141,7 @@ function crearTablaSimbolos(cuerpo) {
 			case 'count':
 			case 'dowhilex':
 			//crear ambito para la sentencia
-			amb_sent=crearAmbito(getAmbito()+'$'+sent.nombre+i,-1);
+			amb_sent=crearAmbito(getAmbito()+'$'+sent.nombre+i,-1,sent.nombre);
 			//buscar ambito padre
 			amb_padre=buscarAmbito(TablaSimbolos[TablaSimbolos.length-1],getAmbito());
 			//se agrega ambito a ambito en tabla de simbolos
@@ -152,7 +154,7 @@ function crearTablaSimbolos(cuerpo) {
 			break;
 			case 'for':
 			//crear ambito para la sentencia
-			amb_sent=crearAmbito(getAmbito()+'$'+sent.nombre+i,-1);
+			amb_sent=crearAmbito(getAmbito()+'$'+sent.nombre+i,-1,sent.nombre);
 			//buscar ambito padre
 			amb_padre=buscarAmbito(TablaSimbolos[TablaSimbolos.length-1],getAmbito());
 			//se agrega ambito a ambito en tabla de simbolos
@@ -166,7 +168,7 @@ function crearTablaSimbolos(cuerpo) {
 				insertarVar(v_for,amb_sent);
 			}
 			//buscar el cuerpo de la sentencia
-			cuerpo_sent=buscarCuerpo(sent);			
+			cuerpo_sent=buscarCuerpo(sent);
 			crearTablaSimbolos(cuerpo_sent);
 			ambito.pop();
 			break;
@@ -184,8 +186,8 @@ function buscarCuerpo(sentencia) {
 	}
 	return null;
 }
-function crearAmbito(nombre,tipo) {
-	var ambito={nombre:nombre,tipo:tipo,variables:[],ambitos:[]};
+function crearAmbito(nombre,tipo,rol) {
+	var ambito={nombre:nombre,tipo:tipo,variables:[],ambitos:[],rol:rol};
 	return ambito;
 }
 function insertarAmbito(ambito) {
@@ -196,7 +198,7 @@ function insertarVar(variable,amb_actual) {
 	amb_actual.variables.push(variable);
 }
 function crearVariable(nombre,pos,tipo,tam,ambito,dim) {
-	var variable={nombre:nombre,pos:pos,tipo:tipo,rol:'var',tam:tam,ambito:ambito,dim:dim};
+	var variable={nombre:nombre,pos:pos,tipo:tipo,rol:'variable',tam:tam,ambito:ambito,dim:dim};
 	return variable;
 }
 function buscarAmbito(ambito,nombre) {
@@ -221,4 +223,83 @@ function buscarAmbito(ambito,nombre) {
 		return null;
 	}
 
+}
+function TS_HTML() {
+	tabla_html='';
+	tabla_html+=recorrerTabla(TablaSimbolos[0]);
+	return tabla_html;
+}
+function recorrerTabla(ambito) {
+	var cad_tabla='';
+	//imprimirlos datos del ambito actual
+	var nom_amb=ambito.nombre.split('$');
+	var amb='global';
+	for(var i=1;i<nom_amb.length-1;i++){
+		amb+='$'+nom_amb[i];
+	}
+	if(ambito.nombre==='global'){
+		cad_tabla+='<tr class="active">';
+		cad_tabla+='<td>'+nom_amb[nom_amb.length-1]+'</td>';
+		cad_tabla+='<td></td>';//principal no tiene posicion
+		cad_tabla+='<td></td>';
+		cad_tabla+='<td></td>';
+		cad_tabla+='<td></td>';
+		cad_tabla+='<td></td>';
+		cad_tabla+='<td></td>';
+		cad_tabla+='</tr>\n';
+	}else{
+		if(ambito.rol==='funcion'){
+			cad_tabla+='<tr class="info">';
+			//var ambito={nombre:nombre,tipo:tipo,variables:[],ambitos:[],rol:rol};
+			//nombre,pos,tipo,tam,ambito,rol,dim
+			cad_tabla+='<td>'+nom_amb[nom_amb.length-1]+'</td>';
+			cad_tabla+='<td></td>';//funcion no tiene posicion
+			cad_tabla+='<td>'+valTipo(ambito.tipo)+'</td>';
+			cad_tabla+='<td>'+ambito.variables.length+'</td>';
+			cad_tabla+='<td>'+amb+'</td>';
+			cad_tabla+='<td>'+ambito.rol+'</td>';
+			if(ambito.dim===null){
+				cad_tabla+='<td></td>';
+			}else{
+				cad_tabla+='<td></td>';
+			}
+			cad_tabla+='</tr>\n';
+		}else if(ambito.rol!=='variable'){
+			cad_tabla+='<tr>';
+			cad_tabla+='<td class="info">'+nom_amb[nom_amb.length-1]+'</td>';
+			cad_tabla+='<td></td>';//funcion no tiene posicion
+			cad_tabla+='<td>'+valTipo(ambito.tipo)+'</td>';
+			cad_tabla+='<td>'+ambito.variables.length+'</td>';
+			cad_tabla+='<td>'+amb+'</td>';
+			cad_tabla+='<td>'+ambito.rol+'</td>';
+			if(ambito.dim===null){
+				cad_tabla+='<td></td>';
+			}else{
+				//TODO: verificar dimensione de ambito al recorrer la tabla de simbolos
+				cad_tabla+='<td></td>';
+			}
+			cad_tabla+='</tr>\n';
+		}
+	}
+	for(var j=0;j<ambito.variables.length;j++){
+		//nombre,pos,tipo,tam,ambito,dim
+		cad_tabla+='<tr>';
+		cad_tabla+='<td>'+ambito.variables[j].nombre+'</td>';
+		cad_tabla+='<td>'+ambito.variables[j].pos+'</td>';
+		cad_tabla+='<td>'+valTipo(ambito.variables[j].tipo)+'</td>';
+		cad_tabla+='<td>'+ambito.variables[j].tam+'</td>';
+		cad_tabla+='<td>'+ambito.variables[j].ambito+'</td>';
+		cad_tabla+='<td>'+ambito.variables[j].rol+'</td>';
+		if(ambito.dim===null){
+			cad_tabla+='<td></td>';
+		}else{
+			//TODO: verificar dimensione de variable al recorrer la tabla de simbolos
+			cad_tabla+='<td></td>';
+		}
+		cad_tabla+='</tr>\n';
+	}
+	for(var k=0;k<ambito.ambitos.length;k++){
+		cad_tabla+=recorrerTabla(ambito.ambitos[k]);
+	}
+	return cad_tabla;
 }

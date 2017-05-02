@@ -221,7 +221,7 @@ REPEAT : repeat '{' CUERPO '}' until '(' EXP ')'{$$={nombre:'repeat',hijos:[$3,$
 FOR : for '(' VARFOR EXP ';' ASIGNACION ')' '{' CUERPO '}'
 	{$$={nombre:'for',hijos:[$3,$4,$6,$9]};};
 VARFOR : ASIGNACION ';'{$$=$1;}
-	   | tnum id '=' EXP ';'
+	   | tnum id ':' EXP ';'
 	   {
 	   var v= {nombre:'lid',hijos:[$2]};
 	   $$={nombre:'dec',tipo:'tnum',hijos:[v,$4]};
@@ -236,7 +236,12 @@ DOWHILEX : do '{' CUERPO '}' whilex '(' EXP ',' EXP ')'{$$={nombre:'dowhilex',hi
 LLAMADO : id '(' LPARFUN ')'
 	    {
 	    $$={nombre:'llamado',valor:$1,hijos:[$3]};
-	    };
+	    }
+			|id '(' LPARFUN ')' '.' LIDP
+				    {
+				    $6.unshift({nombre:'llamado',valor:$1,hijos:[$3]});
+						$$=$6;
+				    };
 LPARFUN : LPARFUN ',' EXP {$1.hijos.push($2);$$=$1;}
 		|EXP {$$={nombre:'lparfun',hijos:[$1]};}
 		|{$$={nombre:'lparfun',hijos:[]};};

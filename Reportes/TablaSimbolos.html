@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>TablaSimbolos</title>
+	<link rel="stylesheet" type="text/css" href="../bootstrap/css/bootstrap.css">
+    <script src="../Analisis/Avanzado.js"></script>
+	<script src="../bootstrap/js/bootstrap.min.js"></script>
+	<script src="../blockly/blockly_compressed.js"></script>
+    <script src="../blockly/blocks_compressed.js"></script>
+    <script src="../blockly/msg/js/es.js"></script>
+    <script src="../jquery-3.2.1.min.js"></script>
+    <script src="../blockly/javascript_compressed.js"></script>
+		<script src="../Analisis/Constante.js"></script>
+    <script src="../Analisis/Recorrido.js"></script>
+    <script src="../Analisis/Casteo.js"></script>
+    <script src="../Analisis/TablaSimbolos.js"></script>
+    <script type="text/javascript">
+		$(document).ready(function () {
+      $("#tablasimbolos").append(localStorage['ts']);
+      });
+	</script>
+
+</head>
+<body>
+	<ul class="nav nav-tabs" role="tablist">		
+    <li role="presentation" class="active"><a href="../Reportes/TablaSimbolos.html">TablaSimbolos</a></li>
+	</ul>
+	<br/>
+	<div class="container">
+		<div class="row">
+	      <div class="col-md-12">
+        </br>
+	      	<table class="table" id="tablasimbolos">
+            <tr class="warning"><th>NOMBRE</th><th>POSICION</th><th>TIPO</th><th>TAMANO</th><th>AMBITO</th><th>ROL</th><th>DIM</th></tr>
+
+          </table>
+	      </div>
+      </div>
+    </div>
+</body>
+</html>

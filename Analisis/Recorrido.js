@@ -26,6 +26,8 @@ function recorrido(result) {
 	var global=crearAmbito('global',0);
 	insertarAmbito(global);
 	crearTablaSimbolos(result);
+	var ts=TS_HTML();
+	localStorage['ts']=ts;
 	//buscar principal
 	var principal=buscar_principal(result);
 	//verificar si se declaro metodo principal
@@ -284,6 +286,7 @@ function evaluarExp(exp) {
 		break;
 		case 'lidp':
 		//TODO: acceder a id en tabla de simbolos
+		
 		break;
 		case '+':
 		var t1=evaluarExp(exp.hijos[0]);
