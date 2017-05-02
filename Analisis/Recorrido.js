@@ -33,6 +33,8 @@ function recorrido(result) {
 	//verificar si se declaro metodo principal
 	if(principal !== null){
 		console.log("principal");
+		//agregar principal a ambito
+		ambito.push('principal');
 		//recorrer cuerpo de principal
 		ejecutar_Sent(principal.hijos[0]);
 		//imprimir codigo 3D generado
@@ -60,6 +62,7 @@ function ejecutar_Sent(cuerpo) {
 			asigVar(sent);
 			break;
 		case Constante._if:
+		  ambito.push(sent.nombre+i);
 			cad_3d+='//inicio if\n';
 			//se ejecuta condicion
 			cad_3d+='//evaluar condicion if\n';
@@ -78,16 +81,20 @@ function ejecutar_Sent(cuerpo) {
 				cad_3d+='//etiquetas falsas if\n';
 				cad_3d+=cond.lf.join(':\n')+':\n';
 				if(sent.hijos.length===3){
+					ambito.push('else'+i);
 					ejecutar_Sent(sent.hijos[2]);
 					cad_3d+='goto '+lsalto+'\n';
+					ambito.pop();
 				}
 				cad_3d+=lsalto+':\n';
+				ambito.pop();
 			}else{
 				var error='Error semantico, evaluar condicion de tipo '+valTipo();
 				insertarError(error);
 			}
 			break;
 		case Constante._while:
+		ambito.push(sent.nombre+i);
 			cad_3d+='//inicio while\n';
 			var lcond=genera_Etq();
 			cad_3d+=lcond+':\n';
@@ -106,8 +113,10 @@ function ejecutar_Sent(cuerpo) {
 				var error='Error semantico, evaluar condicion de tipo '+valTipo();
 				insertarError(error);
 			}
+			ambito.pop();
 			break;
 			case Constante._dowhile:
+				ambito.push(sent.nombre+i);
 				cad_3d+='//inicio dowhile\n';
 				var linicio=genera_Etq();
 				cad_3d+=linicio+':\n';
@@ -126,7 +135,9 @@ function ejecutar_Sent(cuerpo) {
 					insertarError(error);
 				}
 				break;
+				ambito.pop();
 				case Constante._repeat:
+					ambito.push(sent.nombre+i);
 					cad_3d+='//inicio repeat\n';
 					linicio=genera_Etq();
 					cad_3d+=linicio+':\n';
@@ -144,8 +155,10 @@ function ejecutar_Sent(cuerpo) {
 						var error='Error semantico, evaluar condicion de tipo '+valTipo();
 						insertarError(error);
 					}
+					ambito.pop();
 					break;
 				case Constante._for:
+					ambito.push(sent.nombre+i);
 					cad_3d+='//inicio for\n';
 					//ejecutar hijo 0 para declaracion o asignacion
 					if(sent.hijos[0].nombre===Constante.dec){
@@ -175,8 +188,10 @@ function ejecutar_Sent(cuerpo) {
 						var error='Error semantico, evaluar condicion de tipo '+valTipo();
 						insertarError(error);
 					}
+					ambito.pop();
 					break;
 					case Constante._loop:
+						ambito.push(sent.nombre+i);
 						//TODO: agregar display para controlar id en loop
 						//valor almacena id de loop
 						//hijo0 tiene el cuerpo
@@ -186,30 +201,33 @@ function ejecutar_Sent(cuerpo) {
 						cad_3d+='//ejecuetar sentencias loop\n';
 						ejecutar_Sent(sent.hijos[0]);
 						cad_3d+='goto '+linicio+'\n';
+						ambito.pop();
 						break;
 					case Constante._count:
-					cad_3d+='//inicio count'+'\n';
-					linicio=genera_Etq();
-					var lv=genera_Etq();
-					var lf=genera_Etq();
-					cad_3d+='//obtener valor de expresion\n';
-					//obtener valor de exp
-					var count=evaluarExp(sent.hijos[0]);
-					var cont=genera_Temp();//variable que lleva contro el ciclo que se esta ejecutando
-					cad_3d+=cont+'=0;\n';
-					//verificar si la variable de -control es menor a la cantidad que indica la exresion
-					cad_3d+='//verificar si se debe ejecutar count\n';
-					cad_3d+=linicio+':\n';
-					cad_3d+='if ('+cont+'<'+count.temp+') goto '+lv+';\n';
-					cad_3d+='goto '+lf+';\n';
-					cad_3d+='//ejecutar cuerpo count\n';
-					cad_3d+=lv+':\n';
-					ejecutar_Sent(sent.hijos[1]);
-					//aumentar cont
-					cad_3d+='//aumentar cont\n';
-					cad_3d+=cont+'='+cont+'+1\n';
-					cad_3d+='goto '+linicio+'\n';
-					cad_3d+=lf+':\n';
+						ambito.push(sent.nombre+i);
+						cad_3d+='//inicio count'+'\n';
+						linicio=genera_Etq();
+						var lv=genera_Etq();
+						var lf=genera_Etq();
+						cad_3d+='//obtener valor de expresion\n';
+						//obtener valor de exp
+						var count=evaluarExp(sent.hijos[0]);
+						var cont=genera_Temp();//variable que lleva contro el ciclo que se esta ejecutando
+						cad_3d+=cont+'=0;\n';
+						//verificar si la variable de -control es menor a la cantidad que indica la exresion
+						cad_3d+='//verificar si se debe ejecutar count\n';
+						cad_3d+=linicio+':\n';
+						cad_3d+='if ('+cont+'<'+count.temp+') goto '+lv+';\n';
+						cad_3d+='goto '+lf+';\n';
+						cad_3d+='//ejecutar cuerpo count\n';
+						cad_3d+=lv+':\n';
+						ejecutar_Sent(sent.hijos[1]);
+						//aumentar cont
+						cad_3d+='//aumentar cont\n';
+						cad_3d+=cont+'='+cont+'+1\n';
+						cad_3d+='goto '+linicio+'\n';
+						cad_3d+=lf+':\n';
+						ambito.pop();
 						break;
 		}
 	}
@@ -285,8 +303,14 @@ function evaluarExp(exp) {
 		}
 		break;
 		case 'lidp':
-		//TODO: acceder a id en tabla de simbolos
-		
+		//TODO: buscar variable dentro de tabla de simbolos
+		//verificar si el primer hijo de lidp es un llamado a funcion
+		if(exp.hijos[0].nombre===Constante.llamado){
+
+		}else{
+			//es una lista de atributos
+			return primera=buscarVariable(exp.hijos[0]);
+		}
 		break;
 		case '+':
 		var t1=evaluarExp(exp.hijos[0]);
@@ -378,4 +402,9 @@ function evaluarExp(exp) {
 			return xor(exp);
 	}
 	return exp;
+}
+
+function acceso(id) {
+	//se busca id TablaSimbolos
+	var variable=buscarVariable(id);
 }

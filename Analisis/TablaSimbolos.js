@@ -303,3 +303,51 @@ function recorrerTabla(ambito) {
 	}
 	return cad_tabla;
 }
+function buscarVariable(id) {
+	var variable=null;
+	var existe=false;
+	var cad_amb;//cadena que almacena ambito actual
+	var cont=ambito.length;//total de ambitos en vector
+	var desplazamiento=0;
+	while(!existe && cont!==0){
+		cad_amb='global';
+		for(var i=1;i<cont;i++){
+			cad_amb+='$'+ambito[i];
+		}
+		var amb_actual=buscarAmbito(TablaSimbolos[0],cad_amb);
+		//se busca si la variable esta en amb_actual
+		for(var j=0;j<amb_actual.variables.length;j++){
+			variable=amb_actual.variables[j];
+			if(variable.nombre===id){
+				existe=true;
+				break;
+			}
+		}
+		if(!existe){
+			//buscar ambito padre
+			cad_amb='global';
+			for(var k=1;k<cont-1;k++){
+				cad_amb+='$'+ambito[k];
+			}
+			var amb_padre=buscarAmbito(TablaSimbolos[0],cad_amb);
+			desplazamiento+=amb_padre.variables.length;
+			cont--;
+		}
+	}
+	if(variable!==null){
+		//se encontro variable
+		cad_3d+='//acceso a tabla de simbolos de '+id+'\n';
+		var t_desplazamiento=genera_Temp();
+		var t=genera_Temp();
+		var temp_ref=genera_Temp();
+		var temp={tipo:1,temp:t,temp_ref:temp_ref};
+		cad_3d+='//desplazamiento de ambito\n';
+		cad_3d+=t_desplazamiento+'=p-'+desplazamiento+';\n';
+		cad_3d+='//posicion de '+id+'\n';
+		cad_3d+=temp_ref+'='+t_desplazamiento+'+'+variable.pos+';\n';
+		cad_3d+=t+'=pila['+temp_ref+'];\n';
+		return temp;
+	}else{
+		//la variable no se ha encontrado error
+	}
+}
