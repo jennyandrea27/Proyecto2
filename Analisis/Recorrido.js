@@ -23,30 +23,46 @@ function recorrido(result) {
 	TablaSimbolos=[];
 	ambito=['global'];
 	//agregar ambito global
-	var global=crearAmbito('global',0);
+	var global=crearAmbito('global',0,'','');
 	insertarAmbito(global);
 	crearTablaSimbolos(result);
 	var ts=TS_HTML();
 	localStorage['ts']=ts;
-	//buscar principal
-	var principal=buscar_principal(result);
-	//verificar si se declaro metodo principal
-	if(principal !== null){
-		console.log("principal");
-		//agregar principal a ambito
-		ambito.push('principal');
-		//recorrer cuerpo de principal
-		ejecutar_Sent(principal.hijos[0]);
-		//imprimir codigo 3D generado
-		console.log(cad_3d);
-	}else{
-		console.log("Metodo principal no ha sido declarado.");
-	}
+	//recorrer hijos de basic
+	recorrerBasic(result);
+
 }
 function buscar_principal(result) {
 	for (var i = 0; i <= result.hijos.length; i++) {
 		if(result.hijos[i].nombre==='principal'){
 			return result.hijos[i];
+		}
+	}
+}
+function recorrerBasic(raiz) {
+	for(var i=0;i<raiz.hijos.length;i++){
+		var sent=raiz.hijos[i];
+		switch (sent.nombre) {
+			case Constante.principal:
+			console.log("principal");
+			//agregar principal a ambito
+			ambito.push('principal');
+			//recorrer cuerpo de principal
+			ejecutar_Sent(sent.hijos[0]);
+			//imprimir codigo 3D generado
+			console.log(cad_3d);
+				break;
+			case Constante.decfun:
+
+				break;
+			case Constante.dec:
+
+				break;
+			case Constante.element:
+
+				break;
+			default:
+
 		}
 	}
 }
@@ -134,8 +150,8 @@ function ejecutar_Sent(cuerpo) {
 					var error='Error semantico, evaluar condicion de tipo '+valTipo();
 					insertarError(error);
 				}
-				break;
 				ambito.pop();
+				break;
 				case Constante._repeat:
 					ambito.push(sent.nombre+i);
 					cad_3d+='//inicio repeat\n';
@@ -237,7 +253,7 @@ function decVar(sent) {
 	cad_3d+='//declaracion de variable(s): ';
 	cad_3d+=sent.hijos[0].hijos.join()+'\n';
 	//hijo 0 tiene lidp
-	//TODO: buscar variable en  tabla de simbolos
+
 	//hijo 1 tiene expresion
 	cad_3d+='//evaluar expresion\n';
 	var res=evaluarExp(sent.hijos[1]);
@@ -246,6 +262,7 @@ function asigVar(sent) {
 	cad_3d+='//asignacion de variable: ';
 	cad_3d+=sent.hijos[0].hijos.join()+'\n';
 	//hijo 0 tiene lidp
+	//TODO: buscar variable en  tabla de simbolos
 	//hijo 1 tiene expresion
 	cad_3d+='//evaluar expresion\n';
 	res=evaluarExp(sent.hijos[1]);
@@ -260,6 +277,8 @@ function valTipo(tipo) {
 		return 'str';
 		case 11:
 		return 'void';
+		case 15:
+		return 'id';
 		case -100:
 		return 'error';
 	}
@@ -277,6 +296,8 @@ function cadTipo(tipo) {
 			return 11;
 		case 'error':
 			return -100;
+		case 'id':
+		  return 15;
 		default:
 			return-1;
 	}
@@ -309,7 +330,14 @@ function evaluarExp(exp) {
 
 		}else{
 			//es una lista de atributos
-			return primera=buscarVariable(exp.hijos[0]);
+			//buscar primer variable
+			var primera= buscarVariable(exp.hijos[0]);
+			if(exp.hijos.length>1){
+				//tiene mas hijos id.id.id
+
+			}else{
+				return primera;
+			}
 		}
 		break;
 		case '+':

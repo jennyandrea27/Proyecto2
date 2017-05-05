@@ -4,6 +4,7 @@
 	<title>Avanzado</title>
 	<link rel="stylesheet" type="text/css" href="../bootstrap/css/bootstrap.css">
     <script src="../Analisis/Avanzado.js"></script>
+		<script src="../Analisis/Estructuras.js"></script>
 	<script src="../bootstrap/js/bootstrap.min.js"></script>
 	<script src="../blockly/blockly_compressed.js"></script>
     <script src="../blockly/blocks_compressed.js"></script>
@@ -19,6 +20,10 @@
         $('#bAnalizar').click(function () {
           try {
             var result = Avanzado.parse($('#tbEntrada').val())
+						var estructuras=Estructuras.parse($('#tbEstructuras').val());
+						for(var i=0;i<estructuras.hijos.length;i++){
+							result.hijos.push(estructuras.hijos[i]);
+						}
             alert('Analizado');
             recorrido(result);
             console.log(result)
@@ -38,7 +43,7 @@
 		<li role="presentation"><a href="Basico.html">Basico</a></li>
 		<li role="presentation"><a href="Intermedio.html">Intermedio</a></li>
 		<li role="presentation" class="active"><a href="Avanzado.html">Avanzado</a></li>
-		<li role="presentation"><a href="../Reportes/TablaSimbolos.html">Tabla de Simbolos</a></li>
+		<li role="presentation"><a href="../Reportes/TablaSimbolos.html" target="_blank">Tabla de Simbolos</a></li>
 	</ul>
 	<br/>
 	<div class="container">
@@ -69,7 +74,19 @@
 	              <h3 class="panel-title">Estructuras</h3>
 	            </div>
 	            <div class="panel-body">
-					<textarea id="tbEstructuras" style="height: 600px; width: 100%"></textarea>
+					<textarea id="tbEstructuras" style="height: 600px; width: 100%">
+element : Arbol{
+	element : Nodo {
+		num valor : 15*4;
+		str cadena : "hola";
+		Nodo izq : NULL;
+		Nodo der :NULL;
+	}
+	Nodo izq : NULL;
+	str titulo : "Sin titulo";
+}
+
+					</textarea>
 	            </div>
 	        </div>
 	      </div>

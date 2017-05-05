@@ -57,3 +57,12 @@ str : funcion(num par1, num par3){
     }
   }
 }
+
+//////////////////////////////////////////////// ESTRUCTURAS
+
+element : Nodo {
+num valor : 15*4;
+str cadena : "hola";
+Nodo izq : NULL;
+Nodo der :NULL;
+}

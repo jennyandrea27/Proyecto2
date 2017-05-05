@@ -94,20 +94,30 @@ break;
 case 3:
 this.$={nombre:'basic',hijos:[$$[$0]]};
 break;
-case 4: case 5: case 6: case 7: case 12: case 15: case 29: case 36: case 44: case 48: case 49: case 56: case 58: case 66: case 67: case 69: case 70: case 74: case 75: case 76: case 77: case 78: case 79: case 80: case 91:
+case 4: case 5: case 6: case 7: case 15: case 29: case 36: case 44: case 48: case 49: case 56: case 58: case 66: case 67: case 69: case 70: case 74: case 75: case 76: case 77: case 78: case 79: case 80: case 91:
 this.$=$$[$0];
 break;
 case 8:
 this.$={nombre:'dec',tipo:$$[$0-3],hijos:[$$[$0-2],$$[$0-1]]};
 break;
 case 9:
-this.$='bool';
+this.$={tipo:'bool'};
 break;
 case 10:
-this.$='num';
+this.$={tipo:'num'};
 break;
 case 11:
-this.$='str'
+this.$={tipo:'str'};
+break;
+case 12:
+
+			this.$={tipo:'id',hijos:$$[$0].hijos};
+			if(this.$.hijos.length>1){
+				//error tipo o admite atributo.atributo
+				var error='Error semantico, tipo de variable debe ser identificador.';
+				insertarError(error);
+			}
+		
 break;
 case 13: case 53:
 $$[$0-2].hijos.push($$[$0]);this.$=$$[$0-2];
@@ -288,7 +298,7 @@ break;
 case 99:
 
 	   var v= {nombre:'lid',hijos:[$$[$0-3]]};
-	   this.$={nombre:'dec',tipo:'tnum',hijos:[v,$$[$0-1]]};
+	   this.$={nombre:'dec',tipo:'num',hijos:[v,$$[$0-1]]};
 	   
 break;
 case 100:

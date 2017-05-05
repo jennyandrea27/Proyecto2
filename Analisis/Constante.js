@@ -16,10 +16,11 @@ var Constante={
   _dowhile:'dowhile',
   _repeat:'repeat',
   _loop:'loop',
-  _count:'count',  
+  _count:'count',
   llamado:'llamado',
   lparfun:'lparfun',
   principal:'principal',
+  element:'element',
   dec:'dec',
   lid:'lid',
   array:'array',
@@ -54,6 +55,7 @@ var Constante={
   tbool:3,
   tstr:7,
   tvoid:11,
+  tid:15,
   terror:-100,
   tnull:-47361124
 };

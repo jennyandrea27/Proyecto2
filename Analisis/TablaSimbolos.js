@@ -14,14 +14,18 @@ function crearTablaSimbolos(cuerpo) {
 			case 'dec':
 			//ambito actual
 			var amb_actual=buscarAmbito(TablaSimbolos[0],getAmbito());
+			var tipo_ele='';
 			//tipo
-			var tipo=cadTipo(sent.tipo);
+			var tipo=cadTipo(sent.tipo.tipo);
+			if(tipo===Constante.tid){
+				tipo_ele=sent.tipo.hijos[0];
+			}
 			//hijo 0 tiene lid
 			var lid=sent.hijos[0];
 			for(var j=0;j<lid.hijos.length;j++){
 				//por cada hijo en lid se agrega una variable a ambito amb_actual
 				//crear variable
-				var variable=crearVariable(lid.hijos[j],amb_actual.variables.length,tipo,1,amb_actual.nombre,null);
+				var variable=crearVariable(lid.hijos[j],amb_actual.variables.length,tipo,1,amb_actual.nombre,null,tipo_ele=tipo_ele);
 				//insertar varible
 				insertarVar(variable,amb_actual);
 			}
@@ -32,7 +36,10 @@ function crearTablaSimbolos(cuerpo) {
 			var amb=buscarAmbito(TablaSimbolos[0],getAmbito());
 			//es una declaracion de arreglo, la variable contiene dimensiones
 			var nombre=sent.valor;
-			var t_arr=cadTipo(sent.tipo);
+			var t_arr=cadTipo(sent.tipo.tipo);
+			if(t_arr===Constante.tid){
+				tipo_ele=sent.tipo.hijos[0];
+			}
 			//dimensiones lista_corchetes_valor en hijo 0
 			var lcv=sent.hijos[0];
 			//cada hijo de lcv es una dimension con indice inf e indice sup
@@ -47,8 +54,11 @@ function crearTablaSimbolos(cuerpo) {
 			break;
 			case "decfun":
 			//se crea ambito de funciones
-			var tipo_fun=cadTipo(sent.tipo);
-			var amb_fun=crearAmbito(getAmbito()+'$'+sent.valor,tipo_fun,'funcion');
+			var tipo_fun=cadTipo(sent.tipo.tipo);
+			if(tipo_fun===Constante.tid){
+				tipo_ele=sent.tipo.hijos[0];
+			}
+			var amb_fun=crearAmbito(getAmbito()+'$'+sent.valor,tipo_fun,'funcion',tipo_ele);
 			var dim_ret=null;
 			//en el hijo 2 puede tener corchetes
 			if(sent.hijos.length===3){
@@ -76,16 +86,20 @@ function crearTablaSimbolos(cuerpo) {
 				}
 			}
 			//se inserta una variabla para retorno
-			var ret=crearVariable('retorno',0,tipo_fun,1,amb_fun.nombre,dim_ret);
+			var ret=crearVariable('retorno',0,tipo_fun,1,amb_fun.nombre,dim_ret,tipo_ele);
 			ret.rol='retorno';
 			insertarVar(ret,amb_fun);
 			//se recorre lista de parametros para agregarlos al ambito
 			//hijos 0 tiene lpar
 			var lpar=sent.hijos[0];
 			for (var l = 0; l < lpar.hijos.length; l++) {
-				var t_par=cadTipo(lpar.hijos[l].tipo);
+				var t_par=cadTipo(lpar.hijos[l].tipo.tipo);
+				tipo_ele='';
+				if(t_par===Constante.tid){
+					tipo_ele=lpar.hijos[l].tipo.hijos[0];
+				}
 				var n_par=lpar.hijos[l].nombre;
-				var parametro=crearVariable(n_par,amb_fun.variables.length,t_par,1,amb_fun.nombre,null);
+				var parametro=crearVariable(n_par,amb_fun.variables.length,t_par,1,amb_fun.nombre,null,tipo_ele);
 				//insertar varible
 				insertarVar(parametro,amb_fun);
 			}
@@ -98,7 +112,7 @@ function crearTablaSimbolos(cuerpo) {
 			break;
 			case 'principal':
 			//crear ambito para principal
-			var amb_principal=crearAmbito(getAmbito()+'$principal',11,'funcion');//es tipo void
+			var amb_principal=crearAmbito(getAmbito()+'$principal',11,'funcion','');//es tipo void
 			//se agrega ambito a ambito en tabla de simbolos
 			TablaSimbolos[TablaSimbolos.length-1].ambitos.push(amb_principal);
 			ambito.push('principal');
@@ -108,7 +122,7 @@ function crearTablaSimbolos(cuerpo) {
 			break;
 			case 'if':
 			//crear ambito para if
-			var amb_sent=crearAmbito(getAmbito()+'$'+sent.nombre+i,-1,sent.nombre);
+			var amb_sent=crearAmbito(getAmbito()+'$'+sent.nombre+i,-1,sent.nombre,'');
 			//buscar ambito padre
 			var nomb_amb_padre=ambito.join('$');
 			console.log(nomb_amb_padre);
@@ -141,7 +155,7 @@ function crearTablaSimbolos(cuerpo) {
 			case 'count':
 			case 'dowhilex':
 			//crear ambito para la sentencia
-			amb_sent=crearAmbito(getAmbito()+'$'+sent.nombre+i,-1,sent.nombre);
+			amb_sent=crearAmbito(getAmbito()+'$'+sent.nombre+i,-1,sent.nombre,'');
 			//buscar ambito padre
 			amb_padre=buscarAmbito(TablaSimbolos[TablaSimbolos.length-1],getAmbito());
 			//se agrega ambito a ambito en tabla de simbolos
@@ -154,7 +168,7 @@ function crearTablaSimbolos(cuerpo) {
 			break;
 			case 'for':
 			//crear ambito para la sentencia
-			amb_sent=crearAmbito(getAmbito()+'$'+sent.nombre+i,-1,sent.nombre);
+			amb_sent=crearAmbito(getAmbito()+'$'+sent.nombre+i,-1,sent.nombre,'');
 			//buscar ambito padre
 			amb_padre=buscarAmbito(TablaSimbolos[TablaSimbolos.length-1],getAmbito());
 			//se agrega ambito a ambito en tabla de simbolos
@@ -163,14 +177,26 @@ function crearTablaSimbolos(cuerpo) {
 			//verificar si la variable de control es una asignacion
 			if(sent.hijos[0].nombre===Constante.dec){
 				var n_v_for=sent.hijos[0].hijos[0].hijos[0];
-				var v_for=crearVariable(n_v_for,amb_sent.variables.length,sent.hijos[0].tipo,1,amb_sent.nombre,null);
+				var v_for=crearVariable(n_v_for,amb_sent.variables.length,cadTipo(sent.hijos[0].tipo),1,amb_sent.nombre,null,'');
 				//insertar varible
 				insertarVar(v_for,amb_sent);
+			}else{
+				//ejecutar asignacion
+
 			}
 			//buscar el cuerpo de la sentencia
 			cuerpo_sent=buscarCuerpo(sent);
 			crearTablaSimbolos(cuerpo_sent);
 			ambito.pop();
+			break;
+			case 'element':
+				amb_sent=crearAmbito(getAmbito()+'$'+sent.valor,-1,sent.nombre,'');
+				//buscar ambito padre
+				amb_padre=buscarAmbito(TablaSimbolos[TablaSimbolos.length-1],getAmbito());
+				amb_padre.ambitos.push(amb_sent);
+				ambito.push(sent.valor);
+				crearTablaSimbolos(sent.hijos[0]);
+				ambito.pop();
 			break;
 		}
 	}
@@ -186,8 +212,8 @@ function buscarCuerpo(sentencia) {
 	}
 	return null;
 }
-function crearAmbito(nombre,tipo,rol) {
-	var ambito={nombre:nombre,tipo:tipo,variables:[],ambitos:[],rol:rol};
+function crearAmbito(nombre,tipo,rol,tipo_ele) {
+	var ambito={nombre:nombre,tipo:tipo,variables:[],ambitos:[],rol:rol,tipo_ele:tipo_ele};
 	return ambito;
 }
 function insertarAmbito(ambito) {
@@ -197,8 +223,8 @@ function insertarVar(variable,amb_actual) {
 	//TODO: verificar que no exista la variable a insertar
 	amb_actual.variables.push(variable);
 }
-function crearVariable(nombre,pos,tipo,tam,ambito,dim) {
-	var variable={nombre:nombre,pos:pos,tipo:tipo,rol:'variable',tam:tam,ambito:ambito,dim:dim};
+function crearVariable(nombre,pos,tipo,tam,ambito,dim,tipo_ele) {
+	var variable={nombre:nombre,pos:pos,tipo:tipo,rol:'variable',tam:tam,ambito:ambito,dim:dim,tipo_ele:tipo_ele};
 	return variable;
 }
 function buscarAmbito(ambito,nombre) {
@@ -254,7 +280,31 @@ function recorrerTabla(ambito) {
 			//nombre,pos,tipo,tam,ambito,rol,dim
 			cad_tabla+='<td>'+nom_amb[nom_amb.length-1]+'</td>';
 			cad_tabla+='<td></td>';//funcion no tiene posicion
-			cad_tabla+='<td>'+valTipo(ambito.tipo)+'</td>';
+			if(valTipo(ambito.tipo)==='id'){
+				cad_tabla+='<td>'+ambito.tipo_ele+'</td>';
+			}else{
+				cad_tabla+='<td>'+valTipo(ambito.tipo)+'</td>';
+			}
+			cad_tabla+='<td>'+ambito.variables.length+'</td>';
+			cad_tabla+='<td>'+amb+'</td>';
+			cad_tabla+='<td>'+ambito.rol+'</td>';
+			if(ambito.dim===null){
+				cad_tabla+='<td></td>';
+			}else{
+				cad_tabla+='<td></td>';
+			}
+			cad_tabla+='</tr>\n';
+		}else if(ambito.rol==='element'){
+			cad_tabla+='<tr class="success">';
+			//var ambito={nombre:nombre,tipo:tipo,variables:[],ambitos:[],rol:rol};
+			//nombre,pos,tipo,tam,ambito,rol,dim
+			cad_tabla+='<td>'+nom_amb[nom_amb.length-1]+'</td>';
+			cad_tabla+='<td></td>';//funcion no tiene posicion
+			if(valTipo(ambito.tipo)==='id'){
+				cad_tabla+='<td>'+ambito.tipo_ele+'</td>';
+			}else{
+				cad_tabla+='<td>'+valTipo(ambito.tipo)+'</td>';
+			}
 			cad_tabla+='<td>'+ambito.variables.length+'</td>';
 			cad_tabla+='<td>'+amb+'</td>';
 			cad_tabla+='<td>'+ambito.rol+'</td>';
@@ -268,7 +318,11 @@ function recorrerTabla(ambito) {
 			cad_tabla+='<tr>';
 			cad_tabla+='<td class="info">'+nom_amb[nom_amb.length-1]+'</td>';
 			cad_tabla+='<td></td>';//funcion no tiene posicion
-			cad_tabla+='<td>'+valTipo(ambito.tipo)+'</td>';
+			if(valTipo(ambito.tipo)==='id'){
+				cad_tabla+='<td>'+ambito.tipo_ele+'</td>';
+			}else{
+				cad_tabla+='<td>'+valTipo(ambito.tipo)+'</td>';
+			}
 			cad_tabla+='<td>'+ambito.variables.length+'</td>';
 			cad_tabla+='<td>'+amb+'</td>';
 			cad_tabla+='<td>'+ambito.rol+'</td>';
@@ -286,7 +340,11 @@ function recorrerTabla(ambito) {
 		cad_tabla+='<tr>';
 		cad_tabla+='<td>'+ambito.variables[j].nombre+'</td>';
 		cad_tabla+='<td>'+ambito.variables[j].pos+'</td>';
-		cad_tabla+='<td>'+valTipo(ambito.variables[j].tipo)+'</td>';
+		if(valTipo(ambito.variables[j].tipo)==='id'){
+			cad_tabla+='<td>'+ambito.variables[j].tipo_ele+'</td>';
+		}else{
+			cad_tabla+='<td>'+valTipo(ambito.variables[j].tipo)+'</td>';
+		}
 		cad_tabla+='<td>'+ambito.variables[j].tam+'</td>';
 		cad_tabla+='<td>'+ambito.variables[j].ambito+'</td>';
 		cad_tabla+='<td>'+ambito.variables[j].rol+'</td>';
@@ -340,14 +398,24 @@ function buscarVariable(id) {
 		var t_desplazamiento=genera_Temp();
 		var t=genera_Temp();
 		var temp_ref=genera_Temp();
-		var temp={tipo:1,temp:t,temp_ref:temp_ref};
+		var temp={tipo:variable.tipo,temp:t,temp_ref:temp_ref,tipo_ele:variable.tipo_ele};
 		cad_3d+='//desplazamiento de ambito\n';
 		cad_3d+=t_desplazamiento+'=p-'+desplazamiento+';\n';
 		cad_3d+='//posicion de '+id+'\n';
 		cad_3d+=temp_ref+'='+t_desplazamiento+'+'+variable.pos+';\n';
-		cad_3d+=t+'=pila['+temp_ref+'];\n';
+		cad_3d+=t+'=stack['+temp_ref+'];\n';
 		return temp;
 	}else{
 		//la variable no se ha encontrado error
+		var error='Error semantico, la variable '+id+' no ha sido declarada';
+		return insertarError(error);
 	}
+}
+function buscarElemento(nombre) {
+	for(var i=0;i<TablaSimbolos.length;i++){
+		if(TablaSimbolos[i].nombre===nombre){
+			return TablaSimbolos[i];
+		}
+	}
+	return null;
 }
