@@ -111,7 +111,7 @@ this.$={tipo:'str'};
 break;
 case 12:
 
-			this.$={tipo:'id',hijos:$$[$0].hijos};
+			this.$={tipo:'id',hijos:[$$[$0].hijos[0]]};
 			if(this.$.hijos.length>1){
 				//error tipo o admite atributo.atributo
 				var error='Error semantico, tipo de variable debe ser identificador.';
@@ -119,11 +119,17 @@ case 12:
 			}
 		
 break;
-case 13: case 53:
-$$[$0-2].hijos.push($$[$0]);this.$=$$[$0-2];
+case 13:
+
+		 var lidp={nombre:'lidp',hijos:[$$[$0]]};
+		 $$[$0-2].hijos.push(lidp);this.$=$$[$0-2];
+	 
 break;
 case 14:
-this.$={nombre:'lid',hijos:[$$[$0]]};
+
+		 var lidp={nombre:'lidp',hijos:[$$[$0]]};
+		 this.$={nombre:'lidc',hijos:[lidp]};
+	 
 break;
 case 16: case 59: case 84: case 93:
 this.$=null;
@@ -221,6 +227,9 @@ break;
 case 52:
 this.$={nombre:'null'};
 break;
+case 53:
+$$[$0-2].hijos.push($$[$0]);this.$=$$[$0-2];
+break;
 case 54:
 this.$={nombre:'lidp',hijos:[$$[$0]]};
 break;
@@ -297,8 +306,9 @@ this.$={nombre:'for',hijos:[$$[$0-7],$$[$0-6],$$[$0-4],$$[$0-1]]};
 break;
 case 99:
 
-	   var v= {nombre:'lid',hijos:[$$[$0-3]]};
-	   this.$={nombre:'dec',tipo:'num',hijos:[v,$$[$0-1]]};
+		 var lidp={nombre:'lidp',hijos:[$$[$0-3]]};
+	   var lidc= {nombre:'lidc',hijos:[lidp]};
+	   this.$={nombre:'dec',tipo:'num',hijos:[lidc,$$[$0-1]]};
 	   
 break;
 case 100:

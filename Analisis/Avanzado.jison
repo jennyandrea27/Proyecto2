@@ -117,15 +117,23 @@ TVAR : tbool {$$={tipo:'bool'};}
 	  |tstr {$$={tipo:'str'};}
 	  |LIDP
 		{
-			$$={tipo:'id',hijos:$1.hijos};
+			$$={tipo:'id',hijos:[$1.hijos[0]]};
 			if($$.hijos.length>1){
 				//error tipo o admite atributo.atributo
 				var error='Error semantico, tipo de variable debe ser identificador.';
 				insertarError(error);
 			}
 		};
-LIDC : LIDC ',' id {$1.hijos.push($3);$$=$1;}
-	 | id {$$={nombre:'lid',hijos:[$1]};};
+LIDC : LIDC ',' id
+	 {
+		 var lidp={nombre:'lidp',hijos:[$3]};
+		 $1.hijos.push(lidp);$$=$1;
+	 }
+	 | id
+	 {
+		 var lidp={nombre:'lidp',hijos:[$1]};
+		 $$={nombre:'lidc',hijos:[lidp]};
+	 };
 VALVAR : ':' EXP {$$=$2;}
        | {$$=null;};
 DECARR : array ':' id LCV of TVAR ';'{$$={nombre:'array',tipo:$6,valor:$3,hijos:[$4]};};
@@ -231,8 +239,9 @@ FOR : for '(' VARFOR EXP ';' ASIGNACION ')' '{' CUERPO '}'
 VARFOR : ASIGNACION ';'{$$=$1;}
 	   | tnum id ':' EXP ';'
 	   {
-	   var v= {nombre:'lid',hijos:[$2]};
-	   $$={nombre:'dec',tipo:'num',hijos:[v,$4]};
+		 var lidp={nombre:'lidp',hijos:[$2]};
+	   var lidc= {nombre:'lidc',hijos:[lidp]};
+	   $$={nombre:'dec',tipo:'num',hijos:[lidc,$4]};
 	   };
 BREAK : break id{$$={nombre:'break',hijos:[$2]};}
 	  | break{$$={nombre:'break',hijos:[]};};

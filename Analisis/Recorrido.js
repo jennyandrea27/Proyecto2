@@ -22,6 +22,7 @@ function recorrido(result) {
 	//tabla de simbolos
 	TablaSimbolos=[];
 	ambito=['global'];
+	Errores=[];
 	//agregar ambito global
 	var global=crearAmbito('global',0,'','');
 	insertarAmbito(global);
@@ -30,7 +31,8 @@ function recorrido(result) {
 	localStorage['ts']=ts;
 	//recorrer hijos de basic
 	recorrerBasic(result);
-
+	//imprimir codigo 3D generado
+	console.log(cad_3d);
 }
 function buscar_principal(result) {
 	for (var i = 0; i <= result.hijos.length; i++) {
@@ -44,22 +46,36 @@ function recorrerBasic(raiz) {
 		var sent=raiz.hijos[i];
 		switch (sent.nombre) {
 			case Constante.principal:
-			console.log("principal");
-			//agregar principal a ambito
-			ambito.push('principal');
-			//recorrer cuerpo de principal
-			ejecutar_Sent(sent.hijos[0]);
-			//imprimir codigo 3D generado
-			console.log(cad_3d);
+				cad_3d+='principal(){\n';
+				//agregar principal a ambito
+				ambito.push('principal');
+				//recorrer cuerpo de principal
+				ejecutar_Sent(sent.hijos[0]);
+				cad_3d+='}\n';
+				ambito.pop();
 				break;
 			case Constante.decfun:
-
+				//recorrer parametros para formar el nombre de la funcion
+				var fun=buscarAmbito(TablaSimbolos[0],'global$'+sent.valor);
+				var par='';
+				for(var j=0;j<fun.variables.length;j++){
+					if(fun.variables[j].rol==='parametro'){
+						par+='~'+valTipo(fun.variables[j].tipo);
+					}
+				}
+				cad_3d+=sent.valor+par+'(){\n';
+				//agregar funcion a ambito
+				ambito.push(sent.valor+par);
+				//recorrer cuerpo de funcion
+				ejecutar_Sent(sent.hijos[1]);
+				cad_3d+='}\n';
+				ambito.pop();
 				break;
 			case Constante.dec:
-
+				decVar(sent);
 				break;
 			case Constante.element:
-
+				//TODO: metodos init y constructor
 				break;
 			default:
 
@@ -79,7 +95,7 @@ function ejecutar_Sent(cuerpo) {
 			break;
 		case Constante._if:
 		  ambito.push(sent.nombre+i);
-			cad_3d+='//inicio if\n';
+			cad_3d+='//INICIO IF\n';
 			//se ejecuta condicion
 			cad_3d+='//evaluar condicion if\n';
 			var cond=evaluarExp(sent.hijos[0]);
@@ -96,14 +112,13 @@ function ejecutar_Sent(cuerpo) {
 				//si tiene else se ejecuta cuerpo else, sentencias falsas
 				cad_3d+='//etiquetas falsas if\n';
 				cad_3d+=cond.lf.join(':\n')+':\n';
+				ambito.pop();
 				if(sent.hijos.length===3){
 					ambito.push('else'+i);
 					ejecutar_Sent(sent.hijos[2]);
-					cad_3d+='goto '+lsalto+'\n';
 					ambito.pop();
 				}
 				cad_3d+=lsalto+':\n';
-				ambito.pop();
 			}else{
 				var error='Error semantico, evaluar condicion de tipo '+valTipo();
 				insertarError(error);
@@ -111,7 +126,7 @@ function ejecutar_Sent(cuerpo) {
 			break;
 		case Constante._while:
 		ambito.push(sent.nombre+i);
-			cad_3d+='//inicio while\n';
+			cad_3d+='//INICIO WHILE\n';
 			var lcond=genera_Etq();
 			cad_3d+=lcond+':\n';
 			cad_3d+='//evaluar condicion while\n';
@@ -133,7 +148,7 @@ function ejecutar_Sent(cuerpo) {
 			break;
 			case Constante._dowhile:
 				ambito.push(sent.nombre+i);
-				cad_3d+='//inicio dowhile\n';
+				cad_3d+='//INICIO DOWHILE\n';
 				var linicio=genera_Etq();
 				cad_3d+=linicio+':\n';
 				//ejecutar instrucciones del cuerpo
@@ -154,7 +169,7 @@ function ejecutar_Sent(cuerpo) {
 				break;
 				case Constante._repeat:
 					ambito.push(sent.nombre+i);
-					cad_3d+='//inicio repeat\n';
+					cad_3d+='//INICIO REPEAT\n';
 					linicio=genera_Etq();
 					cad_3d+=linicio+':\n';
 					//ejecutar instrucciones del cuerpo
@@ -175,7 +190,7 @@ function ejecutar_Sent(cuerpo) {
 					break;
 				case Constante._for:
 					ambito.push(sent.nombre+i);
-					cad_3d+='//inicio for\n';
+					cad_3d+='//INICIO FOR\n';
 					//ejecutar hijo 0 para declaracion o asignacion
 					if(sent.hijos[0].nombre===Constante.dec){
 						decVar(sent.hijos[0]);
@@ -211,7 +226,7 @@ function ejecutar_Sent(cuerpo) {
 						//TODO: agregar display para controlar id en loop
 						//valor almacena id de loop
 						//hijo0 tiene el cuerpo
-						cad_3d+='//inicio loop '+sent.valor+'\n';
+						cad_3d+='//INICIO LOOP '+sent.valor+'\n';
 						linicio=genera_Etq();
 						cad_3d+=linicio+':\n';
 						cad_3d+='//ejecuetar sentencias loop\n';
@@ -221,7 +236,7 @@ function ejecutar_Sent(cuerpo) {
 						break;
 					case Constante._count:
 						ambito.push(sent.nombre+i);
-						cad_3d+='//inicio count'+'\n';
+						cad_3d+='//INICIO COUNT'+'\n';
 						linicio=genera_Etq();
 						var lv=genera_Etq();
 						var lf=genera_Etq();
@@ -250,22 +265,49 @@ function ejecutar_Sent(cuerpo) {
 }
 
 function decVar(sent) {
-	cad_3d+='//declaracion de variable(s): ';
-	cad_3d+=sent.hijos[0].hijos.join()+'\n';
-	//hijo 0 tiene lidp
-
+	cad_3d+='//DECLARACION DE VARIABLES(s): \n';
 	//hijo 1 tiene expresion
 	cad_3d+='//evaluar expresion\n';
 	var res=evaluarExp(sent.hijos[1]);
+	cad_3d+='//asignar valor a variable\n';
+	var lidc=sent.hijos[0];
+	for(var i=0;i<lidc.hijos.length;i++){
+		cad_3d+='//variable '+lidc.hijos[i].hijos[0]+'\n';
+		//hijo 0 tiene lidp
+		var variable=accesoId(lidc.hijos[i]);
+		//verificar si variable es global
+		if(variable.ambito==='global'){
+			//se accede en heap
+			cad_3d+='heap[ '+variable.temp_ref+' ] = '+res.temp+';\n';
+		}else{
+			//se accede en stack
+			cad_3d+='stack[ '+variable.temp_ref+' ] = '+res.temp+';\n';
+		}
+	}
 }
 function asigVar(sent) {
-	cad_3d+='//asignacion de variable: ';
+	cad_3d+='//ASIGNACION DE VARIABLE: ';
 	cad_3d+=sent.hijos[0].hijos.join()+'\n';
 	//hijo 0 tiene lidp
-	//TODO: buscar variable en  tabla de simbolos
+	var variable=accesoId(sent.hijos[0]);
 	//hijo 1 tiene expresion
 	cad_3d+='//evaluar expresion\n';
 	res=evaluarExp(sent.hijos[1]);
+	cad_3d+='//asignar valor a variable\n';
+	if(sent.hijos[0].hijos.length>1){
+		//fue un acceso a lidp se accede en heap
+		cad_3d+='heap[ '+variable.temp_ref+' ] = '+res.temp+';\n';
+	}else{
+		//verificar si variable es global
+		if(variable.ambito==='global'){
+			//se accede en heap
+			cad_3d+='heap[ '+variable.temp_ref+' ] = '+res.temp+';\n';
+		}else{
+			//se accede en stack
+			cad_3d+='stack[ '+variable.temp_ref+' ] = '+res.temp+';\n';
+		}
+	}
+
 }
 function valTipo(tipo) {
 	switch (tipo){
@@ -324,22 +366,7 @@ function evaluarExp(exp) {
 		}
 		break;
 		case 'lidp':
-		//TODO: buscar variable dentro de tabla de simbolos
-		//verificar si el primer hijo de lidp es un llamado a funcion
-		if(exp.hijos[0].nombre===Constante.llamado){
-
-		}else{
-			//es una lista de atributos
-			//buscar primer variable
-			var primera= buscarVariable(exp.hijos[0]);
-			if(exp.hijos.length>1){
-				//tiene mas hijos id.id.id
-
-			}else{
-				return primera;
-			}
-		}
-		break;
+		return accesoId(exp);
 		case '+':
 		var t1=evaluarExp(exp.hijos[0]);
 		var t2=evaluarExp(exp.hijos[1]);
@@ -432,7 +459,55 @@ function evaluarExp(exp) {
 	return exp;
 }
 
-function acceso(id) {
-	//se busca id TablaSimbolos
-	var variable=buscarVariable(id);
+function accesoId(exp) {
+	//verificar si el primer hijo de lidp es un llamado a funcion
+	if(exp.hijos[0].nombre===Constante.llamado){
+		//TODO: accesoId cuando el primero es un llamado
+	}else{
+		//es una lista de atributos
+		//buscar primer variable
+		var primera= buscarVariable(exp.hijos[0]);
+		if(exp.hijos.length>1){
+			//tiene mas hijos id.id.id
+			var cont =1;
+			var continuar=true;
+			var amb_ele='global';
+			var atr=null;
+			var elemento;
+			while(cont<exp.hijos.length && continuar){
+				if(primera.tipo===Constante.tid){
+					elemento=buscarAmbito(TablaSimbolos[0],amb_ele+'$'+primera.tipo_ele);
+					if(elemento!==null){
+						atr=buscarAtributo(elemento,exp.hijos[cont]);
+						if(atr!==null){
+							var temp_pos=genera_Temp();
+							var temp_val=genera_Temp();
+							cad_3d+='//posicion de '+exp.hijos[cont]+'\n';
+							cad_3d+=temp_pos+' = '+primera.temp+' + '+atr.pos+' ;\n';
+							cad_3d+='//valor de '+exp.hijos[cont]+'\n';
+							cad_3d+=temp_val+' = heap[ '+temp_pos+' ];\n';
+							cont=cont+1;
+							amb_ele+='$'+primera.tipo_ele;
+							primera={tipo:atr.tipo,temp:temp_val,temp_ref:temp_pos,tipo_ele:atr.tipo_ele};
+						}else{
+							continuar=false;
+							var error='Error semantico, elemento '+primera.tipo_ele+' no tiene atributo '+exp.hijos[cont]+'.';
+							insertarError(error);
+						}
+					}else{
+						continuar=false;
+						var error='Error semantico, elemento '+primera.tipo_ele+' no ha sido declarado.';
+						insertarError(error);
+					}
+				}else{
+					continuar=false;
+					var error='Error semantico, la variable '+exp.hijos[cont-1]+' no es de tipo elemento.';
+					insertarError(error);
+				}
+			}
+			return primera;
+		}else{
+			return primera;
+		}
+	}
 }

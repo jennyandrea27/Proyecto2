@@ -121,13 +121,19 @@ case 13:
 this.$={tipo:'str'};
 break;
 case 14:
-this.$={tipo:'id',hijos:$$[$0]};
+this.$={tipo:'id',hijos:[$$[$0]]};
 break;
 case 15:
-$$[$0-2].hijos.push($$[$0]);this.$=$$[$0-2];
+
+		 var lidp={nombre:'lidp',hijos:[$$[$0]]};
+		 $$[$0-2].hijos.push(lidp);this.$=$$[$0-2];
+	 
 break;
 case 16:
-this.$={nombre:'lid',hijos:[$$[$0]]};
+
+		 var lidp={nombre:'lidp',hijos:[$$[$0]]};
+		 this.$={nombre:'lidc',hijos:[lidp]};
+	 
 break;
 case 18: case 56:
 this.$=null;

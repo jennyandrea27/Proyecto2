@@ -277,7 +277,6 @@ function and(exp) {
 		}
 	cad_3d+=lv1+':\n';
 	}else{//es una expresion
-		console.log("and exp")
 		var t1=evaluarExp(exp.hijos[0]);
 		console.log(t1);
 		if(t1.tipo!==3){//op2 no es tipo bool

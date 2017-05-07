@@ -25,7 +25,7 @@ function crearTablaSimbolos(cuerpo) {
 			for(var j=0;j<lid.hijos.length;j++){
 				//por cada hijo en lid se agrega una variable a ambito amb_actual
 				//crear variable
-				var variable=crearVariable(lid.hijos[j],amb_actual.variables.length,tipo,1,amb_actual.nombre,null,tipo_ele=tipo_ele);
+				var variable=crearVariable(lid.hijos[j].hijos[0],amb_actual.variables.length,tipo,1,amb_actual.nombre,null,tipo_ele);
 				//insertar varible
 				insertarVar(variable,amb_actual);
 			}
@@ -53,6 +53,7 @@ function crearTablaSimbolos(cuerpo) {
 			insertarVar(var_arr,amb);
 			break;
 			case "decfun":
+			//TODO: cambiar nombre de funcion en tabla de simbolos para agregar tipo de parametros
 			//se crea ambito de funciones
 			var tipo_fun=cadTipo(sent.tipo.tipo);
 			if(tipo_fun===Constante.tid){
@@ -100,6 +101,7 @@ function crearTablaSimbolos(cuerpo) {
 				}
 				var n_par=lpar.hijos[l].nombre;
 				var parametro=crearVariable(n_par,amb_fun.variables.length,t_par,1,amb_fun.nombre,null,tipo_ele);
+				parametro.rol='parametro';
 				//insertar varible
 				insertarVar(parametro,amb_fun);
 			}
@@ -176,7 +178,7 @@ function crearTablaSimbolos(cuerpo) {
 			ambito.push(sent.nombre+i);
 			//verificar si la variable de control es una asignacion
 			if(sent.hijos[0].nombre===Constante.dec){
-				var n_v_for=sent.hijos[0].hijos[0].hijos[0];
+				var n_v_for=sent.hijos[0].hijos[0].hijos[0].hijos[0];
 				var v_for=crearVariable(n_v_for,amb_sent.variables.length,cadTipo(sent.hijos[0].tipo),1,amb_sent.nombre,null,'');
 				//insertar varible
 				insertarVar(v_for,amb_sent);
@@ -396,14 +398,24 @@ function buscarVariable(id) {
 		//se encontro variable
 		cad_3d+='//acceso a tabla de simbolos de '+id+'\n';
 		var t_desplazamiento=genera_Temp();
-		var t=genera_Temp();
 		var temp_ref=genera_Temp();
-		var temp={tipo:variable.tipo,temp:t,temp_ref:temp_ref,tipo_ele:variable.tipo_ele};
-		cad_3d+='//desplazamiento de ambito\n';
-		cad_3d+=t_desplazamiento+'=p-'+desplazamiento+';\n';
-		cad_3d+='//posicion de '+id+'\n';
-		cad_3d+=temp_ref+'='+t_desplazamiento+'+'+variable.pos+';\n';
-		cad_3d+=t+'=stack['+temp_ref+'];\n';
+		var t=genera_Temp();
+		var temp={};
+		if(variable.ambito=='global'){
+			temp={tipo:variable.tipo,temp:t,temp_ref:temp_ref,tipo_ele:variable.tipo_ele,ambito:'global'};
+			cad_3d+='//posicion de '+id+'\n';
+			cad_3d+=temp_ref+' = '+variable.pos+' ;\n';
+			cad_3d+='//valor de '+id+'\n';
+			cad_3d+=t+' = heap[ '+temp_ref+' ];\n';
+		}else{
+			temp={tipo:variable.tipo,temp:t,temp_ref:temp_ref,tipo_ele:variable.tipo_ele,ambito:'local'};
+			cad_3d+='//desplazamiento de ambito\n';
+			cad_3d+=t_desplazamiento+'=p-'+desplazamiento+';\n';
+			cad_3d+='//posicion de '+id+'\n';
+			cad_3d+=temp_ref+'='+t_desplazamiento+'+'+variable.pos+';\n';
+			cad_3d+='//valor de '+id+'\n';
+			cad_3d+=t+'=stack['+temp_ref+'];\n';
+		}
 		return temp;
 	}else{
 		//la variable no se ha encontrado error
@@ -411,10 +423,10 @@ function buscarVariable(id) {
 		return insertarError(error);
 	}
 }
-function buscarElemento(nombre) {
-	for(var i=0;i<TablaSimbolos.length;i++){
-		if(TablaSimbolos[i].nombre===nombre){
-			return TablaSimbolos[i];
+function buscarAtributo(elemento,atributo) {
+	for(var i=0;i<elemento.variables.length;i++){
+		if(elemento.variables[i].nombre===atributo){
+			return elemento.variables[i];
 		}
 	}
 	return null;

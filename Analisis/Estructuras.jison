@@ -121,9 +121,17 @@ DECVAR : TVAR LIDC VALVAR ';' {$$={nombre:'dec',tipo:$1,hijos:[$2,$3]};};
 TVAR : tbool {$$={tipo:'bool'};}
 	  |tnum {$$={tipo:'num'};}
 	  |tstr {$$={tipo:'str'};}
-	  |id {$$={tipo:'id',hijos:$1};};
-LIDC : LIDC ',' id {$1.hijos.push($3);$$=$1;}
-	 | id {$$={nombre:'lid',hijos:[$1]};};
+	  |id {$$={tipo:'id',hijos:[$1]};};
+LIDC : LIDC ',' id
+	 {
+		 var lidp={nombre:'lidp',hijos:[$3]};
+		 $1.hijos.push(lidp);$$=$1;
+	 }
+	 | id
+	 {
+		 var lidp={nombre:'lidp',hijos:[$1]};
+		 $$={nombre:'lidc',hijos:[lidp]};
+	 };
 VALVAR : ':' EXP {$$=$2;}
        | {$$=null;};
 DECARR : array ':' id LCV of TVAR ';'{$$={nombre:'array',tipo:$6,valor:$3,hijos:[$4]};};
