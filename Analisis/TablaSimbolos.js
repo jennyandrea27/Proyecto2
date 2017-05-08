@@ -92,7 +92,7 @@ function crearTablaSimbolos(cuerpo) {
 			insertarVar(ret,amb_fun);
 			//se recorre lista de parametros para agregarlos al ambito
 			//hijos 0 tiene lpar
-			var lpar=sent.hijos[0];
+			var lpar=sent.hijos[0];			
 			for (var l = 0; l < lpar.hijos.length; l++) {
 				var t_par=cadTipo(lpar.hijos[l].tipo.tipo);
 				tipo_ele='';

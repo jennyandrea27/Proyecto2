@@ -135,7 +135,7 @@ LIDC : LIDC ',' id
 		 $$={nombre:'lidc',hijos:[lidp]};
 	 };
 VALVAR : ':' EXP {$$=$2;}
-       | {$$=null;};
+       | {$$={nombre:'null'};};
 DECARR : array ':' id LCV of TVAR ';'{$$={nombre:'array',tipo:$6,valor:$3,hijos:[$4]};};
 LCV : LCV '[' INDICE ']'{$1.hijos.push($3);$$=$1;}
 	| '[' INDICE ']'{$$={nombre:'lcv',hijos:[$2]};};
@@ -177,7 +177,16 @@ LIDP : LIDP '.' id{$1.hijos.push($3);$$=$1;}
 	 | id {$$={nombre:'lidp',hijos:[$1]};};
 DECFUN : TFUN LC ':' id '(' LPAR ')' '{' CUERPO '}'
 		{
-		$$={nombre:'decfun',tipo:$1,valor:$4,hijos:[]};
+		var nomb_fun=$4;
+		for(var i=0;i<$6.hijos.length;i++){
+			console.log($6.hijos[i]);
+			if($6.hijos[i].tipo.tipo==='id'){
+				nomb_fun+='~'+$6.hijos[i].tipo.hijos[0];
+			}else{
+				nomb_fun+='~'+$6.hijos[i].tipo.tipo;
+			}
+		}
+		$$={nombre:'decfun',tipo:$1,valor:nomb_fun,hijos:[]};
 		$$.hijos.push($6);
 		$$.hijos.push($9);
 		if($2 !== null){

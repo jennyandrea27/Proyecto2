@@ -46,7 +46,8 @@ function recorrerBasic(raiz) {
 		var sent=raiz.hijos[i];
 		switch (sent.nombre) {
 			case Constante.principal:
-				cad_3d+='principal(){\n';
+				cad_3d+='\nDECLARACION DE PRINCIPAL\n';
+				cad_3d+='void principal(){\n';
 				//agregar principal a ambito
 				ambito.push('principal');
 				//recorrer cuerpo de principal
@@ -55,17 +56,12 @@ function recorrerBasic(raiz) {
 				ambito.pop();
 				break;
 			case Constante.decfun:
+				cad_3d+='\nDECLARACION DE FUNCION\n';
 				//recorrer parametros para formar el nombre de la funcion
 				var fun=buscarAmbito(TablaSimbolos[0],'global$'+sent.valor);
-				var par='';
-				for(var j=0;j<fun.variables.length;j++){
-					if(fun.variables[j].rol==='parametro'){
-						par+='~'+valTipo(fun.variables[j].tipo);
-					}
-				}
-				cad_3d+=sent.valor+par+'(){\n';
+				cad_3d+='void'+sent.valor+'(){\n';
 				//agregar funcion a ambito
-				ambito.push(sent.valor+par);
+				ambito.push(sent.valor);
 				//recorrer cuerpo de funcion
 				ejecutar_Sent(sent.hijos[1]);
 				cad_3d+='}\n';
@@ -75,10 +71,71 @@ function recorrerBasic(raiz) {
 				decVar(sent);
 				break;
 			case Constante.element:
-				//TODO: metodos init y constructor
+				initElement('global',sent);
 				break;
 			default:
 
+		}
+	}
+}
+function initElement(ambito,element) {
+	//recorrer cuerpo buscando si tiene mas declaraciones de element en su cuerpo
+	var cuerpo=element.hijos[0];
+	for(var i=0;i<cuerpo.hijos.length;i++){
+		if(cuerpo.hijos[i].nombre===Constante.element){
+			initElement(ambito+'$'+element.valor,cuerpo.hijos[i]);
+		}
+	}
+	//encabezado de metodo init
+	cad_3d+='void init$'+ambito+'$'+element.valor+'(){\n';
+	//buscar elemento en la tabal de simbolos
+	var elemento_ts=buscarAmbito(TablaSimbolos[0],ambito+'$'+element.valor);
+	//tomar posicion actual del heap
+	var pos=genera_Temp();
+	cad_3d+='//reserva espacio en heap para '+elemento_ts.nombre+'\n';
+	cad_3d+=pos+' = h ;\n';
+	cad_3d+='h = h + '+elemento_ts.variables.length+';\n';
+	for(var j=0;j<cuerpo.hijos.length;j++){
+		//volver a recorrer cuerpo para buscar declaraciones
+		if(cuerpo.hijos[j].nombre===Constante.dec){
+			var dec=cuerpo.hijos[j];
+			cad_3d+='//evaluar expresion\n';
+			var res=evaluarExp(dec.hijos[1]);
+			//hijo 0 tiene lista de variables a declarar lidp
+			var lidc=dec.hijos[0];
+			for(var l=0;l<lidc.hijos.length;l++){
+				var nomb_var=lidc.hijos[l].hijos[0];//nombre de la variable a declarar
+				var variable=buscarVarAmbitoTS(elemento_ts,nomb_var);
+				cad_3d+='//asignar valor inicial a '+nomb_var+'\n';
+				var pos_var=genera_Temp();
+				cad_3d+=pos_var+' = '+pos+' + '+variable.pos+';\n';
+				cad_3d+='heap[ '+pos_var+' ] = '+res.temp+';\n';
+			}
+		}
+	}
+	//guardar apuntador al elemento_ts
+	var puntero=genera_Temp();
+	cad_3d+=puntero+' = p + 0;\n';
+	cad_3d+='stack[ '+puntero+' ] ='+pos+';\n';
+	cad_3d+='}\n';
+
+
+	// 	cad_3d+='//variable '+lidc.hijos[i].hijos[0]+'\n';
+	// 	var variable=accesoId(lidc.hijos[i]);
+	// 	//verificar si variable es global
+	// 	if(variable.ambito==='global'){
+	// 		//se accede en heap
+	// 		cad_3d+='heap[ '+variable.temp_ref+' ] = '+res.temp+';\n';
+	// 	}else{
+	// 		//se accede en stack
+	// 		cad_3d+='stack[ '+variable.temp_ref+' ] = '+res.temp+';\n';
+	// 	}
+
+}
+function buscarVarAmbitoTS(ambito,nombre) {
+	for(var i = 0;i<ambito.variables.length;i++){
+		if(ambito.variables[i].nombre===nombre){
+			return ambito.variables[i];
 		}
 	}
 }
@@ -350,21 +407,35 @@ function evaluarExp(exp) {
 		case 'valor':
 		switch(exp.tipo){
 			case 'num':
-			var t=genera_Temp();
-			var temp={tipo:1,temp:t};
-			cad_3d+=t+"="+exp.valor+";\n";
-			return temp;
+				var t=genera_Temp();
+				var temp={tipo:1,temp:t};
+				cad_3d+=t+" = "+exp.valor+";\n";
+				return temp;
 			case 'bool':
-			t=genera_Temp();
-			temp={tipo:3,temp:t};
-			if(exp.valor==='true'){
-				cad_3d+=t+"=1;\n";
-			}else{
-				cad_3d+=t+"=0;\n";
-			}
+				t=genera_Temp();
+				temp={tipo:3,temp:t};
+				if(exp.valor==='true'){
+					cad_3d+=t+" = 1;\n";
+				}else{
+					cad_3d+=t+" = 0;\n";
+				}
 			return temp;
+			case 'str':
+				t=genera_Temp();
+				temp={tipo:7,temp:t};
+				cad_3d+='//obtener posicion disponible en heap\n';
+				cad_3d+=t+' = h;\n';
+				cad_3d+='h = h + 1;\n';
+				cad_3d+='heap['+t+'] = s;\n';
+				//se recorre valor de expresion para almacenar cadena en string pool
+				cad_3d+='//obtener posicion disponible en heap\n';
 		}
 		break;
+		case Constante._null:
+			t=genera_Temp();
+			temp={tipo:1,temp:t};
+			cad_3d+=t+" = "+Constante.tnull+";\n";
+			return temp;
 		case 'lidp':
 		return accesoId(exp);
 		case '+':

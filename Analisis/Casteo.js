@@ -23,7 +23,7 @@ function resta(op1,op2) {
 	switch(op1.tipo+op2.tipo){
 		case 2://num con num
 		case 4: //num con bool
-		cad_3d+=t+"="+op1.temp+'-'+op2.temp+";\n";
+		cad_3d+=t+" = "+op1.temp+' - '+op2.temp+";\n";
 		return temp;
 		default:
 		//case 8:str con num
@@ -43,7 +43,7 @@ function mult(op1,op2) {
 		case 2://num con num
 		case 4: //num con bool
 		case 6: // bool con bool
-		cad_3d+=t+"="+op1.temp+'*'+op2.temp+";\n";
+		cad_3d+=t+" = "+op1.temp+' * '+op2.temp+";\n";
 		return temp;
 		case 8://str con num
 		case 10://bool con str
@@ -62,7 +62,7 @@ function div(op1,op2) {
 	switch(op1.tipo+op2.tipo){
 		case 2://num con num
 		case 4: //num con bool
-		cad_3d+=t+"="+op1.temp+'/'+op2.temp+";\n";
+		cad_3d+=t+" = "+op1.temp+' / '+op2.temp+";\n";
 		return temp;
 		case 6: // bool con bool
 		case 8://str con num
@@ -82,7 +82,7 @@ function modulo(op1,op2) {
 	switch(op1.tipo+op2.tipo){
 		case 2://num con num
 		case 4: //num con bool
-		cad_3d+=t+"="+op1.temp+'%'+op2.temp+";\n";
+		cad_3d+=t+" = "+op1.temp+' % '+op2.temp+";\n";
 		return temp;
 		case 6: // bool con bool
 		case 8://str con num
@@ -102,7 +102,7 @@ function potencia(op1,op2) {
 	switch(op1.tipo+op2.tipo){
 		case 2://num con num
 		case 4: //num con bool
-		cad_3d+=t+"="+op1.temp+'^'+op2.temp+";\n";
+		cad_3d+=t+" = "+op1.temp+' ^ '+op2.temp+";\n";
 		return temp;
 		case 6: // bool con bool
 		case 8://str con num
@@ -123,7 +123,7 @@ function igualacion(op1,op2) {
 	switch(op1.tipo+op2.tipo){
 		case 2://num con num
 		case 6: // bool con bool
-		cad_3d+='if ('+op1.temp+' == '+op2.temp+') goto '+lv+';\n';
+		cad_3d+='if( '+op1.temp+' == '+op2.temp+' )goto '+lv+';\n';
 		cad_3d+='goto '+lf+';\n';
 		return temp;
 		case 14://str con str
@@ -147,7 +147,7 @@ function diferencia(op1,op2) {
 	switch(op1.tipo+op2.tipo){
 		case 2://num con num
 		case 6: // bool con bool
-		cad_3d+='if ('+op1.temp+' != '+op2.temp+') goto '+lv+';\n';
+		cad_3d+='if( '+op1.temp+' != '+op2.temp+' )goto '+lv+';\n';
 		cad_3d+='goto '+lf+';\n';
 		return temp;
 		case 14://str con str
@@ -170,7 +170,7 @@ function mayor(op1,op2) {
 	var temp={tipo:3,lv:[lv],lf:[lf]};
 	switch(op1.tipo+op2.tipo){
 		case 2://num con num
-		cad_3d+='if ('+op1.temp+' > '+op2.temp+') goto '+lv+';\n';
+		cad_3d+='if( '+op1.temp+' > '+op2.temp+' )goto '+lv+';\n';
 		cad_3d+='goto '+lf+';\n';
 		return temp;
 		case 14://str con str
@@ -194,7 +194,7 @@ function menor(op1,op2) {
 	var temp={tipo:3,lv:[lv],lf:[lf]};
 	switch(op1.tipo+op2.tipo){
 		case 2://num con num
-		cad_3d+='if ('+op1.temp+' < '+op2.temp+') goto '+lv+';\n';
+		cad_3d+='if( '+op1.temp+' < '+op2.temp+' )goto '+lv+';\n';
 		cad_3d+='goto '+lf+';\n';
 		return temp;
 		case 14://str con str
@@ -218,7 +218,7 @@ function mayorigual(op1,op2) {
 	var temp={tipo:3,lv:[lv],lf:[lf]};
 	switch(op1.tipo+op2.tipo){
 		case 2://num con num
-		cad_3d+='if ('+op1.temp+' >= '+op2.temp+') goto '+lv+';\n';
+		cad_3d+='if( '+op1.temp+' >= '+op2.temp+' )goto '+lv+';\n';
 		cad_3d+='goto '+lf+';\n';
 		return temp;
 		case 14://str con str
@@ -240,7 +240,7 @@ function menorigual(op1,op2) {
 	var temp={tipo:3,lv:[lv],lf:[lf]};
 	switch(op1.tipo+op2.tipo){
 		case 2://num con num
-		cad_3d+='if ('+op1.temp+' <= '+op2.temp+') goto '+lv+';\n';
+		cad_3d+='if( '+op1.temp+' <= '+op2.temp+' )goto '+lv+';\n';
 		cad_3d+='goto '+lf+';\n';
 		return temp;
 		case 14://str con str
@@ -264,9 +264,9 @@ function and(exp) {
 		var lf1=genera_Etq();
 			if(exp.hijos[0].valor === 'true'){//es verdadero
 				//construir if
-				cad_3d+='if (1 == 1) goto '+lv1+';\n';
+				cad_3d+='if( 1 == 1 )goto '+lv1+';\n';
 			}else{
-				cad_3d+='if (1 == 0) goto '+lv1+';\n';
+				cad_3d+='if( 1 == 0 )goto '+lv1+';\n';
 			}
 			cad_3d+='goto '+lf1+';\n';
 			temp.lf.push(lf1);
@@ -294,9 +294,9 @@ function and(exp) {
 		var lf2=genera_Etq();
 			if(exp.hijos[1].valor === 'true'){//es verdadero
 				//construir if
-				cad_3d+='if (1 == 1) goto '+lv2+';\n';
+				cad_3d+='if( 1 == 1 )goto '+lv2+';\n';
 			}else{
-				cad_3d+='if (1 == 0) goto '+lv2+';\n';
+				cad_3d+='if( 1 == 0 )goto '+lv2+';\n';
 			}
 			cad_3d+='goto '+lf2+';\n';
 			temp.lv.push(lv2);
@@ -326,9 +326,9 @@ function or(exp) {
 		var lf1=genera_Etq();
 			if(exp.hijos[0].valor === 'true'){//es verdadero
 				//construir if
-				cad_3d+='if (1 == 1) goto '+lv1+';\n';
+				cad_3d+='if( 1 == 1 )goto '+lv1+';\n';
 			}else{
-				cad_3d+='if (1 == 0) goto '+lv1+';\n';
+				cad_3d+='if( 1 == 0 )goto '+lv1+';\n';
 			}
 			cad_3d+='goto '+lf1+';\n';
 			temp.lv.push(lv1);
@@ -355,9 +355,9 @@ function or(exp) {
 		var lf2=genera_Etq();
 			if(exp.hijos[1].valor === 'true'){//es verdadero
 				//construir if
-				cad_3d+='if (1 == 1) goto '+lv2+';\n';
+				cad_3d+='if( 1 == 1 )goto '+lv2+';\n';
 			}else{
-				cad_3d+='if (1 == 0) goto '+lv2+';\n';
+				cad_3d+='if( 1 == 0 )goto '+lv2+';\n';
 			}
 			cad_3d+='goto '+lf2+';\n';
 			temp.lv.push(lv2);
@@ -387,9 +387,9 @@ function not(exp) {
 			var lv1=genera_Etq();
 			var lf1=genera_Etq();
 			if(exp.valor === 'true'){//es verdadero se hace falso
-				cad_3d+='if (1 == 1) goto '+lv1+';\n';
+				cad_3d+='if( 1 == 1 )goto '+lv1+';\n';
 			}else{
-				cad_3d+='if (1 == 0) goto '+lv1+';\n';
+				cad_3d+='if( 1 == 0 )goto '+lv1+';\n';
 			}
 			cad_3d+='goto '+lf1+':\n';
 			temp.lv.push(lf1);
@@ -424,9 +424,9 @@ function xor(exp) {
 			var lv1=genera_Etq();
 			var lf1=genera_Etq();
 			if(exp.hijos[0].valor === 'true'){//es verdadero se hace falso
-				cad_3d+='if (1 == 1) goto '+lv1+';\n';
+				cad_3d+='if( 1 == 1 )goto '+lv1+';\n';
 			}else{
-				cad_3d+='if (1 == 0) goto '+lv1+';\n';
+				cad_3d+='if( 1 == 0 )goto '+lv1+';\n';
 			}
 			cad_3d+='goto '+lf1+':\n';
 			cad_3d+=lv1+':\n';
@@ -459,9 +459,9 @@ function xor(exp) {
 			var lv2=genera_Etq();
 			var lf2=genera_Etq();
 			if(exp.hijos[1].valor === 'true'){//es verdadero se hace falso
-				cad_3d+='if (1 == 1) goto '+lv2+';\n';
+				cad_3d+='if( 1 == 1 )goto '+lv2+';\n';
 			}else{
-				cad_3d+='if (1 == 0) goto '+lv2+';\n';
+				cad_3d+='if( 1 == 0 )goto '+lv2+';\n';
 			}
 			cad_3d+='goto '+lf2+':\n';
 			cad_3d+=lv2+':\n';
@@ -489,7 +489,7 @@ function xor(exp) {
 	cad_3d+=lverifica+':\n';
 	var lv=genera_Etq();
 	var lf=genera_Etq();
-	cad_3d+='if ('+t1+'!='+t2+') goto '+lv+';\n';
+	cad_3d+='if( '+t1+' != '+t2+' )goto '+lv+';\n';
 	cad_3d+='goto '+lf+';\n';
 	var temp={tipo:3,lv:[lv],lf:[lf]};
 	return temp;

@@ -131,8 +131,8 @@ case 14:
 		 this.$={nombre:'lidc',hijos:[lidp]};
 	 
 break;
-case 16: case 59: case 84: case 93:
-this.$=null;
+case 16: case 52:
+this.$={nombre:'null'};
 break;
 case 17:
 this.$={nombre:'array',tipo:$$[$0-1],valor:$$[$0-4],hijos:[$$[$0-3]]};
@@ -224,9 +224,6 @@ break;
 case 51: case 68: case 71: case 73: case 81: case 83: case 98:
 this.$=$$[$0-1];
 break;
-case 52:
-this.$={nombre:'null'};
-break;
 case 53:
 $$[$0-2].hijos.push($$[$0]);this.$=$$[$0-2];
 break;
@@ -235,7 +232,16 @@ this.$={nombre:'lidp',hijos:[$$[$0]]};
 break;
 case 55:
 
-		this.$={nombre:'decfun',tipo:$$[$0-9],valor:$$[$0-6],hijos:[]};
+		var nomb_fun=$$[$0-6];
+		for(var i=0;i<$$[$0-4].hijos.length;i++){
+			console.log($$[$0-4].hijos[i]);
+			if($$[$0-4].hijos[i].tipo.tipo==='id'){
+				nomb_fun+='~'+$$[$0-4].hijos[i].tipo.hijos[0];
+			}else{
+				nomb_fun+='~'+$$[$0-4].hijos[i].tipo.tipo;
+			}
+		}
+		this.$={nombre:'decfun',tipo:$$[$0-9],valor:nomb_fun,hijos:[]};
 		this.$.hijos.push($$[$0-4]);
 		this.$.hijos.push($$[$0-1]);
 		if($$[$0-8] !== null){
@@ -245,6 +251,9 @@ case 55:
 break;
 case 57:
 this.$='void'
+break;
+case 59: case 84: case 93:
+this.$=null;
 break;
 case 60:
 var v={nombre:$$[$0-1],tipo:$$[$0-2],hijos:[$$[$0]]};$$[$0-4].hijos.push(v);this.$=$$[$0-4];

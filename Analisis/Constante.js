@@ -51,6 +51,7 @@ var Constante={
   cuerpo:'cuerpo',
   _true:'true',
   _false:'false',
+  _null:'null',
   tnum:1,
   tbool:3,
   tstr:7,
