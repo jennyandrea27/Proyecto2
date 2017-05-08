@@ -29,6 +29,8 @@ function recorrido(result) {
 	crearTablaSimbolos(result);
 	var ts=TS_HTML();
 	localStorage['ts']=ts;
+	//generar funciones por DEFECTO
+	crearFuncionesDefecto();
 	//recorrer hijos de basic
 	recorrerBasic(result);
 	//imprimir codigo 3D generado
@@ -408,12 +410,12 @@ function evaluarExp(exp) {
 		switch(exp.tipo){
 			case 'num':
 				var t=genera_Temp();
-				var temp={tipo:1,temp:t};
+				var temp={tipo:Constante.tnum,temp:t};
 				cad_3d+=t+" = "+exp.valor+";\n";
 				return temp;
 			case 'bool':
 				t=genera_Temp();
-				temp={tipo:3,temp:t};
+				temp={tipo:Constante.tbool,temp:t};
 				if(exp.valor==='true'){
 					cad_3d+=t+" = 1;\n";
 				}else{
@@ -422,13 +424,22 @@ function evaluarExp(exp) {
 			return temp;
 			case 'str':
 				t=genera_Temp();
-				temp={tipo:7,temp:t};
+				temp={tipo:Constante.tstr,temp:t};
 				cad_3d+='//obtener posicion disponible en heap\n';
 				cad_3d+=t+' = h;\n';
 				cad_3d+='h = h + 1;\n';
-				cad_3d+='heap['+t+'] = s;\n';
+				cad_3d+='heap[ '+t+' ] = s;\n';
 				//se recorre valor de expresion para almacenar cadena en string pool
-				cad_3d+='//obtener posicion disponible en heap\n';
+				cad_3d+='//almacenar cadena en string pool '+exp.valor+'\n';
+				for(var i=0;i<exp.valor.length;i++){
+					cad_3d+='//ascci de '+exp.valor[i]+'\n';
+					cad_3d+='pool[ s ] = '+exp.valor.charCodeAt(i)+';\n';
+					cad_3d+='s = s + 1;\n';
+				}
+				cad_3d+='//ascci de fin de cadena\n';
+				cad_3d+='pool[ s ] = 0;\n';
+				cad_3d+='s = s + 1;\n';
+				return temp;
 		}
 		break;
 		case Constante._null:

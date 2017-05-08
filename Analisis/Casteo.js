@@ -13,6 +13,7 @@ function suma(op1,op2) {
 		case 14://str con str
 		//concatenacion
 		//TODO: concatenacion de valores con cadenas
+		//llamado a $$_concatenacion();
 		break;
 	}
 }
