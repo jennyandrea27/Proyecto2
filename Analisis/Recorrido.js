@@ -80,18 +80,19 @@ function recorrerBasic(raiz) {
 		}
 	}
 }
-function initElement(ambito,element) {
+function initElement(cad_ambito,element) {
 	//recorrer cuerpo buscando si tiene mas declaraciones de element en su cuerpo
+	ambito.push(element.valor);
 	var cuerpo=element.hijos[0];
 	for(var i=0;i<cuerpo.hijos.length;i++){
 		if(cuerpo.hijos[i].nombre===Constante.element){
-			initElement(ambito+'$'+element.valor,cuerpo.hijos[i]);
+			initElement(cad_ambito+'$'+element.valor,cuerpo.hijos[i]);
 		}
 	}
 	//encabezado de metodo init
-	cad_3d+='void init$'+ambito+'$'+element.valor+'(){\n';
+	cad_3d+='void init$'+cad_ambito+'$'+element.valor+'(){\n';
 	//buscar elemento en la tabal de simbolos
-	var elemento_ts=buscarAmbito(TablaSimbolos[0],ambito+'$'+element.valor);
+	var elemento_ts=buscarAmbito(TablaSimbolos[0],cad_ambito+'$'+element.valor);
 	//tomar posicion actual del heap
 	var pos=genera_Temp();
 	cad_3d+='//reserva espacio en heap para '+elemento_ts.nombre+'\n';
@@ -115,24 +116,12 @@ function initElement(ambito,element) {
 			}
 		}
 	}
+	ambito.pop();
 	//guardar apuntador al elemento_ts
 	var puntero=genera_Temp();
 	cad_3d+=puntero+' = p + 0;\n';
 	cad_3d+='stack[ '+puntero+' ] ='+pos+';\n';
 	cad_3d+='}\n';
-
-
-	// 	cad_3d+='//variable '+lidc.hijos[i].hijos[0]+'\n';
-	// 	var variable=accesoId(lidc.hijos[i]);
-	// 	//verificar si variable es global
-	// 	if(variable.ambito==='global'){
-	// 		//se accede en heap
-	// 		cad_3d+='heap[ '+variable.temp_ref+' ] = '+res.temp+';\n';
-	// 	}else{
-	// 		//se accede en stack
-	// 		cad_3d+='stack[ '+variable.temp_ref+' ] = '+res.temp+';\n';
-	// 	}
-
 }
 function buscarVarAmbitoTS(ambito,nombre) {
 	for(var i = 0;i<ambito.variables.length;i++){
