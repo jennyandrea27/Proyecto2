@@ -44,7 +44,7 @@ function concatenacion() {
   val_cad1=genera_Temp();
   etq_inicio1=genera_Etq();
   cad_3d+=cont1+' = 0;\n';
-  cad_3d+=etq_inicio1+':\n'
+  cad_3d+=etq_inicio1+':\n';
   cad_3d+=pos_cad1+' = '+val_tx+' + '+cont1+'\n';
   cad_3d+=val_cad1+' = pool[ '+pos_cad1+' ];\n';
   lv1=genera_Etq();

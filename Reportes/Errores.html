@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>TablaSimbolos</title>
+	<title>TablaErrores</title>
 	<link rel="stylesheet" type="text/css" href="../bootstrap/css/bootstrap.css">
     <script src="../Analisis/Avanzado.js"></script>
 	<script src="../bootstrap/js/bootstrap.min.js"></script>
@@ -14,25 +14,26 @@
     <script src="../Analisis/Recorrido.js"></script>
     <script src="../Analisis/Casteo.js"></script>
     <script src="../Analisis/TablaSimbolos.js"></script>
+    <script src="../Reportes/Errores.js"></script>
     <script type="text/javascript">
 		$(document).ready(function () {
-      $("#tablasimbolos").append(localStorage['ts']);
+      $("#tablaerrores").append(localStorage['te']);
       });
 	</script>
 
 </head>
 <body>
 	<ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="active"><a href="../Reportes/TablaSimbolos.html">Tabla de Simbolos</a></li>
-		<li role="presentation"><a href="../Reportes/Errores.html">Tabla de Errores<
+    <li role="presentation"><a href="../Reportes/TablaSimbolos.html">Tabla Simbolos</a></li>
+    <li role="presentation" class="active"><a href="../Reportes/Errores.html">Tabla de Errores</a></li>
 	</ul>
 	<br/>
 	<div class="container">
 		<div class="row">
 	      <div class="col-md-12">
         </br>
-	      	<table class="table" id="tablasimbolos">
-            <tr class="warning"><th>NOMBRE</th><th>POSICION</th><th>TIPO</th><th>TAMANO</th><th>AMBITO</th><th>ROL</th><th>DIM</th></tr>
+	      	<table class="table" id="tablaerrores">
+            <tr class="warning"><th>ERROR</th><th>FILA</th><th>COLUMNA</th></tr>
 
           </table>
 	      </div>

@@ -27,7 +27,7 @@ function suma(op1,op2) {
 					temp=llamadoConcatenacion(op_bool1,op2);
 					return temp;
 				}else{
-					var error='Error semantico, no se puede realizar suma entre tipo '+tipo1+' y '+tipo2+' valor de bool debe ser true o false.';
+					var error={desc:'Error semantico, no se puede realizar suma entre tipo '+tipo1+' y '+tipo2+' valor de bool debe ser true o false.',fila:1,col:1};
 					return insertarError(error);
 				}
 			}else{
@@ -162,7 +162,7 @@ function resta(op1,op2) {
 		//error
 		var tipo1=valTipo(op1.tipo);
 		var tipo2=valTipo(op2.tipo);
-		var error='Error semantico, no se puede realizar resta entre tipo '+tipo1+' y '+tipo2;
+		var error={desc:'Error semantico, no se puede realizar resta entre tipo '+tipo1+' y '+tipo2,fila:1,col:1};
 		return insertarError(error);
 	}
 }
@@ -182,7 +182,7 @@ function mult(op1,op2) {
 		//error
 		var tipo1=valTipo(op1.tipo);
 		var tipo2=valTipo(op2.tipo);
-		var error='Error semantico, no se puede realizar multiplicacion entre tipo '+tipo1+' y '+tipo2;
+		var error={desc:'Error semantico, no se puede realizar multiplicacion entre tipo '+tipo1+' y '+tipo2,fila:1,col:1};
 		return insertarError(error);
 	}
 }
@@ -202,7 +202,7 @@ function div(op1,op2) {
 		//error
 		var tipo1=valTipo(op1.tipo);
 		var tipo2=valTipo(op2.tipo);
-		var error='Error semantico, no se puede realizar division entre tipo '+tipo1+' y '+tipo2;
+		var error={desc:'Error semantico, no se puede realizar division entre tipo '+tipo1+' y '+tipo2,fila:1,col:1};
 		return insertarError(error);
 	}
 }
@@ -222,7 +222,7 @@ function modulo(op1,op2) {
 		//error
 		var tipo1=valTipo(op1.tipo);
 		var tipo2=valTipo(op2.tipo);
-		var error='Error semantico, no se puede realizar resta modulo tipo '+tipo1+' y '+tipo2;
+		var error={desc:'Error semantico, no se puede realizar resta modulo tipo '+tipo1+' y '+tipo2,fila:1,col:1};
 		return insertarError(error);
 	}
 }
@@ -242,7 +242,7 @@ function potencia(op1,op2) {
 		//error
 		var tipo1=valTipo(op1.tipo);
 		var tipo2=valTipo(op2.tipo);
-		var error='Error semantico, no se puede realizar potencia entre tipo '+tipo1+' y '+tipo2;
+		var error={desc:'Error semantico, no se puede realizar potencia entre tipo '+tipo1+' y '+tipo2,fila:1,col:1};
 		return insertarError(error);
 	}
 }
@@ -266,7 +266,7 @@ function igualacion(op1,op2) {
 		//error
 		var tipo1=valTipo(op1.tipo);
 		var tipo2=valTipo(op2.tipo);
-		var error='Error semantico, no se puede realizar igualacion entre tipo '+tipo1+' y '+tipo2;
+		var error={desc:'Error semantico, no se puede realizar igualacion entre tipo '+tipo1+' y '+tipo2,fila:1,col:1};
 		return insertarError(error);
 	}
 }
@@ -290,7 +290,7 @@ function diferencia(op1,op2) {
 		//error
 		var tipo1=valTipo(op1.tipo);
 		var tipo2=valTipo(op2.tipo);
-		var error='Error semantico, no se puede realizar igualacion entre tipo '+tipo1+' y '+tipo2;
+		var error={desc:'Error semantico, no se puede realizar igualacion entre tipo '+tipo1+' y '+tipo2,fila:1,col:1};
 		return insertarError(error);
 	}
 }
@@ -314,7 +314,7 @@ function mayor(op1,op2) {
 		//error
 		var tipo1=valTipo(op1.tipo);
 		var tipo2=valTipo(op2.tipo);
-		var error='Error semantico, no se puede realizar igualacion entre tipo '+tipo1+' y '+tipo2;
+		var error={desc:'Error semantico, no se puede realizar igualacion entre tipo '+tipo1+' y '+tipo2,fila:1,col:1};
 		return insertarError(error);
 	}
 }
@@ -338,7 +338,7 @@ function menor(op1,op2) {
 		//error
 		var tipo1=valTipo(op1.tipo);
 		var tipo2=valTipo(op2.tipo);
-		var error='Error semantico, no se puede realizar igualacion entre tipo '+tipo1+' y '+tipo2;
+		var error={desc:'Error semantico, no se puede realizar igualacion entre tipo '+tipo1+' y '+tipo2,fila:1,col:1};
 		return insertarError(error);
 	}
 }
@@ -360,7 +360,7 @@ function mayorigual(op1,op2) {
 		//error
 		var tipo1=valTipo(op1.tipo);
 		var tipo2=valTipo(op2.tipo);
-		var error='Error semantico, no se puede realizar igualacion entre tipo '+tipo1+' y '+tipo2;
+		var error={desc:'Error semantico, no se puede realizar igualacion entre tipo '+tipo1+' y '+tipo2,fila:1,col:1};
 		return insertarError(error);
 	}
 }
@@ -382,7 +382,7 @@ function menorigual(op1,op2) {
 		//error
 		var tipo1=valTipo(op1.tipo);
 		var tipo2=valTipo(op2.tipo);
-		var error='Error semantico, no se puede realizar igualacion entre tipo '+tipo1+' y '+tipo2;
+		var error={desc:'Error semantico, no se puede realizar igualacion entre tipo '+tipo1+' y '+tipo2,fila:1,col:1};
 		return insertarError(error);
 	}
 }
@@ -402,8 +402,8 @@ function and(exp) {
 			temp.lf.push(lf1);
 		}else{
 			var tipo=valTipo(exp.hijos[0].tipo);
-			var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;;
-			return insertarError();
+			var error={desc:'Error semantico, no puede evaluarse and con operador tipo '+tipo,fila:1,col:1};
+			return insertarError(error);
 		}
 	cad_3d+=lv1+':\n';
 	}else{//es una expresion
@@ -411,8 +411,8 @@ function and(exp) {
 		console.log(t1);
 		if(t1.tipo!==3){//op2 no es tipo bool
 			var tipo=valTipo(t1.tipo);
-			var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;;
-			return insertarError();
+			var error={desc:'Error semantico, no puede evaluarse and con operador tipo '+tipo,fila:1,col:1};
+			return insertarError(error);
 		}
 		cad_3d+=t1.lv.join(':\n')+':\n';
 		temp.lf=temp.lf.concat(t1.lf);
@@ -433,15 +433,15 @@ function and(exp) {
 			temp.lf.push(lf2);
 		}else{
 			var tipo=valTipo(exp.hijos[1].tipo);
-			var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;;
-			return insertarError();
+			var error={desc:'Error semantico, no puede evaluarse and con operador tipo '+tipo,fila:1,col:1};
+			return insertarError(error);
 		}
 	}else{//es una expresion
 		var t2=evaluarExp(exp.hijos[1]);
 		if(t2.tipo!==3){//op2 no es tipo bool
 			var tipo=valTipo(t2.tipo);
-			var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;
-			return insertarError();
+			var error={desc:'Error semantico, no puede evaluarse and con operador tipo '+tipo,fila:1,col:1};
+			return insertarError(error);
 		}
 		temp.lv=temp.lv.concat(t2.lv);
 		temp.lf=temp.lf.concat(t2.lf);
@@ -464,16 +464,16 @@ function or(exp) {
 			temp.lv.push(lv1);
 		}else{
 			var tipo=valTipo(exp.hijos[0].tipo);
-			var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;;
-			return insertarError();
+			var error={desc:'Error semantico, no puede evaluarse and con operador tipo '+tipo,fila:1,col:1};
+			return insertarError(error);
 		}
 	cad_3d+=lf1+':\n';
 	}else{//es una expresion
 		var t1=evaluarExp(exp.hijos[0]);
 		if(t1.tipo!==3){//op2 no es tipo bool
 			var tipo=valTipo(t1.tipo);
-			var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;;
-			return insertarError();
+			var error={desc:'Error semantico, no puede evaluarse and con operador tipo '+tipo,fila:1,col:1};
+			return insertarError(error);
 		}
 		cad_3d+=t1.lf.join(':\n')+':\n';
 		temp.lv=temp.lv.concat(t1.lv);
@@ -494,15 +494,15 @@ function or(exp) {
 			temp.lf.push(lf2);
 		}else{
 			var tipo=valTipo(exp.hijos[1].tipo);
-			var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;;
-			return insertarError();
+			var error={desc:'Error semantico, no puede evaluarse and con operador tipo '+tipo,fila:1,col:1};
+			return insertarError(error);
 		}
 	}else{//es una expresion
 		var t2=evaluarExp(exp.hijos[1]);
 		if(t2.tipo!==3){//op2 no es tipo bool
 			var tipo=valTipo(t2.tipo);
-			var error='Error semantico, no puede evaluarse and con operador tipo '+tipo;
-			return insertarError();
+			var error={desc:'Error semantico, no puede evaluarse and con operador tipo '+tipo,fila:1,col:1};
+			return insertarError(error);
 		}
 		temp.lv=temp.lv.concat(t2.lv);
 		temp.lf=temp.lf.concat(t2.lf);
@@ -527,8 +527,8 @@ function not(exp) {
 			return temp;
 		}else{
 			var tipo=valTipo(exp.tipo);
-			var error='Error semantico, no puede evaluarse not con operador tipo '+tipo;
-			return insertarError();
+			var error={desc:'Error semantico, no puede evaluarse not con operador tipo '+tipo,fila:1,col:1};
+			return insertarError(error);
 		}
 	}else{//es una condicion que debe ser evaluada
 		var op1=evaluarExp(exp);
@@ -538,8 +538,8 @@ function not(exp) {
 			temp.lf=op1.lv;
 		}else{
 			var tipo=valTipo(exp.tipo);
-			var error='Error semantico, no puede evaluarse not con operador tipo '+tipo;
-			return insertarError();
+			var error={desc:'Error semantico, no puede evaluarse not con operador tipo '+tipo,fila:1,col:1};
+			return insertarError(error);
 		}
 		return temp;
 	}
@@ -568,8 +568,8 @@ function xor(exp) {
 			cad_3d+=t1+'=0;\n';
 		}else{
 			var tipo=valTipo(exp.tipo);
-			var error='Error semantico, no puede evaluarse not con operador tipo '+tipo;
-			return insertarError();
+			var error={desc:'Error semantico, no puede evaluarse not con operador tipo '+tipo,fila:1,col:1};
+			return insertarError(error);
 		}
 	}else{//es una condicion que debe ser evaluada
 		var op1=evaluarExp(exp.hijos[0]);
@@ -602,9 +602,9 @@ function xor(exp) {
 			cad_3d+=lf2+':\n';
 			cad_3d+=t2+'=0;\n';
 		}else{
-			var tipo=valTipo(exp.tipo);
-			var error='Error semantico, no puede evaluarse not con operador tipo '+tipo;
-			return insertarError();
+			var tipo1=valTipo(exp.tipo);
+			var error={desc:'Error semantico, no puede evaluarse not con operador tipo '+tipo1,fila:1,col:1};
+			return insertarError(error);
 		}
 	}else{//es una condicion que debe ser evaluada
 		var op2=evaluarExp(exp.hijos[1]);
