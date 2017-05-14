@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Debug</title>
+	<link rel="stylesheet" type="text/css" href="../bootstrap/css/bootstrap.css">
+	<script src="../bootstrap/js/bootstrap.js"></script>
+    <script src="../jquery-3.2.1.min.js"></script>
+		<script src="../C3D/C3D.js"></script>
+		<script src="../Analisis/Constante.js"></script>
+		<script src="../Debugg/Debugg.js"></script>
+    <script type="text/javascript">
+		$(document).ready(function () {
+			cad_3d=localStorage['cad_3d'];
+      $("#tbC3D").val(cad_3d);
+			crearArrC3D(cad_3d);
+			ejecutarC3D();
+			$('#bInicio').click(function () {bInicio();});
+			$('#bPausa').click(function () {bPausa();});
+			$('#bAumenta').click(function () {bAumenta();});
+			$('#bDisminuye').click(function () {bDisminuye();});
+			$('#bSiguiente').click(function () {bSiguiente();});
+      });
+	</script>
+</head>
+<body>
+	<ul class="nav nav-tabs" role="tablist">
+    <li role="presentation"><a href="../Reportes/TablaSimbolos.html">Tabla de Simbolos</a></li>
+    <li role="presentation" class="active"><a href="../Reportes/Errores.html">Tabla de Errores</a></li>
+	</ul>
+  <br/>
+	<!--muestra la linea que se esta ejecutando-->
+	<div class="container">
+		<div class="row">
+			<div class="col-md-4">
+      </br>
+      	<table class="table" id="opciones">
+          <tr ><th>Opciones Debugg</th></tr>
+					<tr >
+						<td>
+							<button type="button" class="btn btn-primary btn-lg" id="bInicio">
+								<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+							</button>
+							<button type="button" class="btn btn-primary btn-lg" id="bPausa">
+								<span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
+							</button>
+							<button type="button" class="btn btn-warning btn-lg" id="bDisminuye">
+								<span class="glyphicon glyphicon-fast-backward" aria-hidden="true"></span>
+							</button>
+							<button type="button" class="btn btn-warning btn-lg" id="bAumenta">
+								<span class="glyphicon glyphicon-fast-forward" aria-hidden="true"></span>
+							</button>
+							<button type="button" class="btn btn-warning btn-lg" id="bSiguiente">
+								<span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
+							</button>
+						</td>
+					</tr>
+
+        </table>
+      </div>
+      <div class="col-md-8">
+      </br>
+      	<table class="table" id="tbInstruccion">
+          <tr ><th>Instruccion </th></tr>
+					<tr ><th></th></tr>
+
+        </table>
+      </div>
+    </div>
+  </div>
+		<!--==================================-->
+
+	<div class="container">
+		<div class="row">
+			<div class="col-md-4"><!--C3D-->
+			<div class="panel panel-success">
+	            <div class="panel-heading">
+	              <h3 class="panel-title">Codigo Tres Direcciones</h3>
+	            </div>
+	            <div class="panel-body">
+								<textarea id="tbC3D" style="height: 600px; width: 100%"></textarea>
+	            </div>
+	        </div>
+	      	</div>
+	      <div class="col-md-2"><!--STACK-->
+	      	<table class="table" id="t_stack">
+						<tr class="warning">
+							<th>Stack</th><td> </td>
+						</tr>
+					</table>
+        </div>
+				<div class="col-md-2"><!--HEAP-->
+	      	<table class="table" id="t_heap">
+						<tr class="warning">
+							<th>Heap</th><td> </td>
+						</tr>
+					</table>
+        </div>
+				<div class="col-md-4"><!--POOL-->
+	      	<table class="table" id="t_pool">
+						<tr class="warning">
+							<th>String Pool</th><td> </td>
+						</tr>
+					</table>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

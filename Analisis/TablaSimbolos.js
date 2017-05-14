@@ -73,7 +73,7 @@ function crearTablaSimbolos(cuerpo) {
 						}
 					}
 					if(correcto===false){
-						var error='Error semantico, retorno de funcion incorrecto.';
+						var error={desc:'Error semantico, retorno de funcion incorrecto.',fila:1,col:1};
 						insertarError(error);
 						console.log('incorrecto');
 					}else{
@@ -82,7 +82,7 @@ function crearTablaSimbolos(cuerpo) {
 					}
 				}else{
 					//error
-					var error2='Error semantico, retorno de funcion es tipo void, no se admiten dimensiones.';
+					var error2={desc:'Error semantico, retorno de funcion es tipo void, no se admiten dimensiones.',fila:1,col:1};
 					insertarError(error);
 				}
 			}
@@ -92,7 +92,7 @@ function crearTablaSimbolos(cuerpo) {
 			insertarVar(ret,amb_fun);
 			//se recorre lista de parametros para agregarlos al ambito
 			//hijos 0 tiene lpar
-			var lpar=sent.hijos[0];			
+			var lpar=sent.hijos[0];
 			for (var l = 0; l < lpar.hijos.length; l++) {
 				var t_par=cadTipo(lpar.hijos[l].tipo.tipo);
 				tipo_ele='';
@@ -382,6 +382,7 @@ function buscarVariable(id) {
 				existe=true;
 				break;
 			}
+			variable=null;
 		}
 		if(!existe){
 			//buscar ambito padre
@@ -406,20 +407,20 @@ function buscarVariable(id) {
 			cad_3d+='//posicion de '+id+'\n';
 			cad_3d+=temp_ref+' = '+variable.pos+' ;\n';
 			cad_3d+='//valor de '+id+'\n';
-			cad_3d+=t+' = heap[ '+temp_ref+' ];\n';
+			cad_3d+=t+' = heap [ '+temp_ref+' ] ;\n';
 		}else{
 			temp={tipo:variable.tipo,temp:t,temp_ref:temp_ref,tipo_ele:variable.tipo_ele,ambito:'local'};
 			cad_3d+='//desplazamiento de ambito\n';
-			cad_3d+=t_desplazamiento+'=p-'+desplazamiento+';\n';
+			cad_3d+=t_desplazamiento+' = p - '+desplazamiento+' ;\n';
 			cad_3d+='//posicion de '+id+'\n';
-			cad_3d+=temp_ref+'='+t_desplazamiento+'+'+variable.pos+';\n';
+			cad_3d+=temp_ref+' = '+t_desplazamiento+' + '+variable.pos+' ;\n';
 			cad_3d+='//valor de '+id+'\n';
-			cad_3d+=t+'=stack['+temp_ref+'];\n';
+			cad_3d+=t+' = stack [ '+temp_ref+' ] ;\n';
 		}
 		return temp;
 	}else{
 		//la variable no se ha encontrado error
-		var error='Error semantico, la variable '+id+' no ha sido declarada';
+		var error={desc:'Error semantico, la variable '+id+' no ha sido declarada',fila:1,col:1};
 		return insertarError(error);
 	}
 }
@@ -430,4 +431,38 @@ function buscarAtributo(elemento,atributo) {
 		}
 	}
 	return null;
+}
+function nombreElemento(lidp) {
+	var error;
+	//arbolito.izq
+	var variable=buscarVariable(lidp.hijos[0]);
+	var cad_nombre='global$'+variable.tipo_ele;//global$Arbol
+	var amb_padre=buscarAmbito(TablaSimbolos[0],cad_nombre);
+	if(amb_padre!==null){
+		for(var i=1;i<lidp.hijos.length;i++){
+			//buscar si el elemento tiene atributo
+			variable_atr=buscarAtributo(amb_padre,lidp.hijos[i]);
+			if(variable_atr!==null){//la variable tiene atributo
+				cad_nombre+='$'+variable_atr.tipo_ele;
+				amb_padre=buscarAmbito(TablaSimbolos[0],cad_nombre);
+				if(amb_padre===null){
+					//se debe buscar como element global
+					cad_nombre='global$'+variable.tipo_ele;
+					amb_padre=buscarAmbito(TablaSimbolos[0],cad_nombre);
+					if(amb_padre===null){
+						//error elemento
+						error={desc:'Error semantico, elemento '+variable.tipo_ele+' no ha sido declarado',fila:1,col:1};
+						return insertarError(error);
+					}
+				}
+			}else{
+				error={desc:'Error semantico, elemento '+variable.tipo_ele+' no tiene atributo '+lidp.hijos[i],fila:1,col:1};
+				return insertarError(error);
+			}
+		}
+	}else{
+		error={desc:'Error semantico, elemento '+variable.tipo_ele+' no ha sido declarado',fila:1,col:1};
+		return insertarError(error);
+	}
+	return cad_nombre;
 }

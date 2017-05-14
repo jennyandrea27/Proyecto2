@@ -39,6 +39,7 @@
 "||"                  return '||'
 "|&"                  return '|&'
 "!"                   return '!'
+"create"				  return 'create'
 "bool"				  return 'tbool'
 "str"				  return 'tstr'
 "num"				  return 'tnum'
@@ -165,14 +166,17 @@ EXP2 : EXP2 '+' EXP2 {$$={nombre:'+',hijos: [$1 , $3]};}
 	 | '-' EXP2 {$$={nombre:'-',hijos: [$2]};}
 	 | EXP3 {$$=$1;};
 EXP3 : num {$$={nombre:'valor',tipo:'num', valor : $1};}
-	| true {$$={nombre:'valor',tipo:'bool', valor : 'true'};}
-	| false {$$={nombre:'valor',tipo:'bool', valor : 'false'};}
+	| 'true' {$$={nombre:'valor',tipo:'bool', valor : 'true'};}
+	| 'false' {$$={nombre:'valor',tipo:'bool', valor : 'false'};}
 	| LIDP {$$=$1;}
 	| LLAMADO {$$=$1;}
 	| cad {$$={nombre:'valor',tipo:'str', valor : $1};}
 	| '(' EXP ')'{$$=$2;}
-	| null{$$={nombre:'null'};};
-
+	| null{$$={nombre:'null'};}
+	| 'create' '(' id ')'{$$={nombre:'create',valor:$3};}
+	| FUNDEF{$$=$1;};
+FUNDEF: 'getLength' '(' EXP ')'{$$={nombre='getLength',valor:$3};}
+			| 'getBool' '(' EXP ')'{$$={nombre='getBool',valor:$3};};
 LIDP : LIDP '.' id{$1.hijos.push($3);$$=$1;}
 	 | id {$$={nombre:'lidp',hijos:[$1]};};
 DECFUN : TFUN LC ':' id '(' LPAR ')' '{' CUERPO '}'
